@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+
+<body>{% block content %}
+
+<br>
+Schemes Listing - (Weeks)
+<br>
+
+  <form style="margin-left:2.5em" method="get">
+    {{ filter.form.as_p }}
+
+    <button type="submit">Search</button>
+  </form>
+
+<div> <aside id="rightsidebar">
+    <div class="col-md-10 col-xs-10 col-sm-10">
+    <nav id="nav">
+
+      <br>
+      Total Number     :  {{ total_num.TotNum|floatformat:0 }} <br> <br>
+      <br>
+
+    <table class="content" border="2px">
+    <thead>
+     <tr>
+        <th>Member</th>
+        <th>Class</th>
+        <th>Subject</th>
+        <th>Scheme</th>
+        <th>Date</th>
+        <th>Week</th>
+        <th>Topic</th>
+        <th>Objectives</th>
+        <th>Methods</th>
+        <th>Evaluation</th>
+        <th>Status</th>
+     </tr>
+   </thead>
+
+    <tbody>
+        <tr>
+        {% for clss in filter.qs %}
+           <td> {{ clss.ch_sf_num__sf_surname }} </td>
+           <td> {{ clss.ch_sc_code__sc_desc }} </td>
+           <td> {{ clss.ch_sb_code__sb_desc }} </td>
+           <td><a href="{% url 'r_schemes' clss.ch_num %}">  {{ clss.ch_num }}   </a> </td>
+           <td> {{ clss.ch_eff_date|date:'D-M-Y' }} </td>
+           <td> {{ clss.ch_week }} </td>
+           <td> {{ clss.ch_topic }} </td>
+           <td> {{ clss.ch_objectives }} </td>
+           <td> {{ clss.ch_methods }} </td>
+           <td> {{ clss.ch_evaluation }} </td>
+           <td> {{ clss.ch_status }} </td>
+        </tr>
+        {% endfor %}
+
+    </tbody>
+
+    </table>
+     </nav>
+      </div>
+
+ </aside> </div>
+</body>
+{% endblock %}
+</html>

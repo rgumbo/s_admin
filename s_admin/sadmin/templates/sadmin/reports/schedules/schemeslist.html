@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+
+<body>{% block content %}
+
+<br>
+<br>
+<br>
+
+Schemes Listing
+
+<br>
+<br>
+  <form style="margin-left:2.5em" method="get">
+    {{ filter.form.as_p }}
+
+    <button type="submit">Search</button>
+  </form>
+
+<div> <aside id="rightsidebar">
+    <div class="col-md-10 col-xs-10 col-sm-10">
+    <nav id="nav">
+
+      <br>
+      Total Schemes..................:  {{ sch_tot.CntSch|floatformat:0 }} ---- Pending---
+        {{ sch_ptot.CntPsch|floatformat:0 }}
+      <br>
+      <br>
+
+    <table class="content" border="2px">
+    <thead>
+
+     <tr>
+
+        <th>Level</th>
+        <th>Class</th>
+        <th>Staff</th>
+        <th>Subject</th>
+        <th>Year</th>
+        <th>Term</th>
+        <th>Week</th>
+        <th>Objectives</th>
+        <th>Evaluation</th>
+        <th>View</th>
+
+     </tr>
+   </thead>
+
+   <tbody>
+        <tr>
+        {% for cont in filter.qs %}
+
+            <td> {{ cont.ch_lv_code__lv_name }} </td>
+            <td> {{ cont.ch_sc_code__sc_desc }} </td>
+            <td> {{ cont.ch_sf_num__sf_surname }} </td>
+            <td> {{ cont.ch_sb_code__sb_desc }} </td>
+            <td> {{ cont.ch_year }} </td>
+            <td> {{ cont.ch_term }} </td>
+            <td> {{ cont.ch_week }} </td>
+            <td> {{ cont.ch_objectives }} </td>
+            <td> {{ cont.ch_evaluation }} </td>
+            <td><a href="{% url 'r_schemes' cont.ch_num %}"> View </a> </td>
+        </tr>
+        {% endfor %}
+
+    </tbody>
+
+    </table>
+     </nav>
+    </div>
+
+ </aside> </div>
+</body>
+{% endblock %}
+</html>

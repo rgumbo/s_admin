@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="container-fluid">
+<div class="row"></div>
+<br/>
+
+<div class="row">
+ <div class="col-md-1 col-xs-1 col-sm-1">
+</div>
+
+ <div class="col-md-8 col-xs-8 col-sm-8">
+  <p class="h2"> Scheme  : {{ dailyplan.sp_ch_num }}  </p>
+  <p class="h2"> Level   : {{ dailyplan.sp_lc_num }}  </p>
+  <p class="h2"> Class   : {{ dailyplan.sp_sc_code }} </p>
+  <p class="h2"> Subject : {{ dailyplan.sp_sb_code }} </p>
+  <p class="h2"> Day     : {{ dailyplan.sp_day }}     </p>
+  <p class="h2"> Topic   : {{ dailyplan.sp_topic }}   </p>
+ </div>
+
+<div class="row"> </div>
+ <div class="col-md-1 col-xs-1 col-sm-1"></div>
+ <div class="col-md-10 col-xs-10 col-sm-10">
+
+ </div>
+ <div class="col-md-1 col-xs-1 col-sm-1"></div>
+</div>
+</div>
+{% endblock %}

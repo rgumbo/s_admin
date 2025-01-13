@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+
+<body>{% block content %}
+
+<br>
+<br>
+<br>
+
+Bill Of Resource Requirements
+
+<br>
+<br>
+  <form style="margin-left:2.5em" method="get">
+    {{ filter.form.as_p }}
+
+    <button type="submit">Search</button>
+  </form>
+
+<div> <aside id="rightsidebar">
+    <div class="col-md-10 col-xs-10 col-sm-10">
+    <nav id="nav">
+
+       <br>
+      Total Projects         :  {{ total_inst.TotInst|floatformat:2}}
+      <br>
+      Total Required           :  {{ total_req.TotReq|floatformat:2}}
+      <br>
+      Total Received      :  {{ total_prov.TotProv|floatformat:2}}
+      <br>
+      <br>
+      <br>
+
+    <table class="content" border="2px">
+    <thead>
+     <tr>
+        <th>Stock Type</th>
+        <th>Stock Item</th>
+        <th>Units</th>
+        <th>Qty Required</th>
+        <th>Qty Provided</th>
+     </tr>
+   </thead>
+
+    <tbody>
+        <tr>
+        {% for ord in filter.qs %}
+            <td> {{ord.rs_st_code__st_name}} </td>
+            <td> {{ord.rs_si_code__si_name}} </td>
+            <td> {{ord.rs_unit}} </td>
+
+            <td> {{ord.sum_req|floatformat:2}} </td>
+            <td> {{ord.sum_prov|floatformat:2}} </td>
+        </tr>
+        {% endfor %}
+
+    </tbody>
+
+
+    </table>
+     </nav>
+      </div>
+
+ </aside> </div>
+</body>
+{% endblock %}
+</html>

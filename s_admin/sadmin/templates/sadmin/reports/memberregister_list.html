@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+
+<body>{% block content %}
+
+<br>
+<br>
+<br>
+
+Attendance Register Listing
+
+<br>
+<br>
+  <form style="margin-left:2.5em" method="get">
+    {{ filter.form.as_p }}
+
+    <button type="submit">Search</button>
+  </form>
+
+<div> <aside id="rightsidebar">
+    <div class="col-md-10 col-xs-10 col-sm-10">
+    <nav id="nav">
+
+      <br>
+      Total Number  : {{ total_num.TotNum|floatformat:0 }}
+      <br>
+
+      <br>
+      Total Present : {{ tot_present.TotPresent|floatformat:0 }}
+      <br>
+
+      <br>
+      Total Sick : {{ tot_sick.TotSick|floatformat:0 }}
+      <br>
+
+      <br>
+      Total Absent  : {{ tot_absent.TotAbsent|floatformat:0 }}
+      <br>
+      <br>
+
+    <table class="content" border="2px">
+    <thead>
+     <tr>
+
+        <th>Year</th>
+        <th>Term</th>
+        <th>Class</th>
+        <th>Number</th>
+        <th>Date</th>
+        <th>Surname</th>
+        <th>Name</th>
+        <th>Day</th>
+        <th>Present?</th>
+        <th>Status</th>
+        <th>Edit</th>
+        <th>Account</th>
+
+     </tr>
+   </thead>
+
+    <tbody>
+        <tr>
+        {% for clss in filter.qs %}
+
+            <td> {{ clss.mr_year }} </td>
+            <td> {{ clss.mr_term }} </td>
+            <td> {{ clss.mr_sc_code__sc_desc }} </td>
+            <td> {{ clss.mr_num }} </td>
+            <td> {{ clss.mr_date|date:'D-M-Y' }} </td>
+            <td> {{ clss.mr_cm_num__cm_surname }} </td>
+            <td> {{ clss.mr_cm_num__cm_fname }} </td>
+            <td> {{ clss.mr_day }} </td>
+            <td> {{ clss.mr_mark }} </td>
+            <td> {{ clss.mr_status }} </td>
+            <td><a href="{% url 'editmemberregister' clss.mr_num %}">  Edit </a> </td>
+            <td><a href="{% url 'studentacc' clss.mr_cm_num %}">  View </a> </td>
+
+        </tr>
+        {% endfor %}
+
+    </tbody>
+
+
+    </table>
+     </nav>
+      </div>
+
+ </aside> </div>
+</body>
+{% endblock %}
+</html>

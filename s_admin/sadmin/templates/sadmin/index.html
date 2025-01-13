@@ -1,0 +1,35 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>The Platform</h1>
+  <p>Welcome to your platform - a <em>StarMate Software</em>!</p>
+<br>
+    <li><a href="/bloghome">Notice Board</a></li>
+
+  <h2>Flash:</h2>
+  <ul>
+
+    <li><strong>Number Of Subjects Offered:</strong> <a href="{% url 'subjsched' %}"> {{ num_subject.tot_num }}</a>
+      --Required Hours -- {{ num_subject.tot_hrs }}    </li>
+    <br>
+    <li><strong>Number Of classes:</strong><a href="{% url 'classsched' %}"> {{ tot_class.tot_num }} View </a> </li>
+    <br>
+    <li><strong><a href="{% url 'staffsched' %}"> Number Of Staff - Teaching</a> :</strong> {{ tot_teach.tot_tch }} -- Female -- {{ tot_wteach.tot_wtch }}</li>
+    <br>
+    <li><strong>Number Of Staff - Non-Teaching :</strong> {{ tot_nteach.tot_ntch }} -- Female -- {{ tot_wnteach.tot_wntch }}</li>
+    <br>
+    <li><strong>Number Of Students:</strong> {{ tot_stu.num_stu }} --Female -- {{ tot_fstu.num_fstu }} </li>
+    <br>
+    <li><strong><a href="{% url 'schemesched' %}"> Number Of Weeks - (Schemes) </a> :</strong> {{ tot_wks.num_weeks }} -- Pending -- {{ tot_pwks.num_pweeks }} </li>
+     <br>
+    <li><strong>Number Of Hours Planned - (Daily Plans) :</strong> {{ tot_hrs.num_hrs }} -- Pending -- {{ tot_phrs.num_phrs }} </li>
+    <br>
+    <li><strong><a href="{% url 'attendsched' %}"> Daily Attendance -- Present  </a> :</strong> {{tot_present.num_p}}--- Absent --{{tot_absent.num_a}} --- Sick --{{tot_sick.num_s}}
+    <br>
+    <br>
+    <li><strong><a href="{% url 'spacesched' %}"> Number Of Facilities  </a> :</strong> {{ tot_fac.num_abs }}</li>
+    <br>
+
+  </ul>
+{% endblock %}

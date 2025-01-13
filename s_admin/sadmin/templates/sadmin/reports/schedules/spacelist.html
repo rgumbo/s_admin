@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+
+<body>{% block content %}
+
+<br>
+<br>
+<br>
+
+Spaces Listing
+
+<br>
+<br>
+  <form style="margin-left:2.5em" method="get">
+    {{ filter.form.as_p }}
+
+    <button type="submit">Search</button>
+  </form>
+
+<div> <aside id="rightsidebar">
+    <div class="col-md-10 col-xs-10 col-sm-10">
+    <nav id="nav">
+
+      <br>
+      Total Spaces..................:  {{ space_tot.CntSpace|floatformat:0 }}
+      <br>
+      <br>
+
+    <table class="content" border="2px">
+    <thead>
+
+     <tr>
+        <th>Facility</th>
+        <th>Description</th>
+        <th>Status</th>
+     </tr>
+   </thead>
+
+   <tbody>
+        <tr>
+        {% for cont in filter.qs %}
+
+            <td> {{ cont.fs_fc_num__fc_name }} </td>
+            <td> {{ cont.fs_desc }} </td>
+            <td> {{ cont.fs_status }} </td>
+
+         </tr>
+        {% endfor %}
+
+    </tbody>
+
+    </table>
+     </nav>
+    </div>
+
+ </aside> </div>
+</body>
+{% endblock %}
+</html>

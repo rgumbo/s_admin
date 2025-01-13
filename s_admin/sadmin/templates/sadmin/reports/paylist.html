@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+
+<body>{% block content %}
+
+<br>
+<br>
+<br>
+
+Transaction Listing
+
+<br>
+<br>
+  <form style="margin-left:2.5em" method="get">
+    {{ filter.form.as_p }}
+
+    <button type="submit">Search</button>
+  </form>
+
+<div> <aside id="rightsidebar">
+    <div class="col-md-10 col-xs-10 col-sm-10">
+    <nav id="nav">
+
+      <br>
+      Total Receipts........:  {{ sum_camnt.SumCamnt|floatformat:2 }}
+      <br>
+      Total Dues...............:  {{ sum_damnt.SumDamnt|floatformat:2 }}
+      <br>
+       Percentage Settled.......: {{perc}}
+      <br>
+
+    <table class="content" border="2px">
+    <thead>
+
+     <tr>
+        <th>School Class</th>
+        <th>Surname</th>
+        <th>Name</th>
+        <th>Guardian</th>
+        <th>Phone</th>
+        <th>Year</th>
+        <th>Term</th>
+        <th>Trans Date</th>
+        <th>Dr/Cr</th>
+        <th>Amount</th>
+        <th>View</th>
+        <th>Payment</th>
+
+     </tr>
+   </thead>
+    <tbody>
+        <tr>
+        {% for cont in filter.qs %}
+
+            <td> {{ cont.mr_sc_code__sc_desc }} </td>
+            <td> {{ cont.mr_cm_num__cm_surname }} </td>
+            <td> {{ cont.mr_cm_num__cm_fname }} </td>
+            <td> {{ cont.mr_cm_num__cm_guardian }} </td>
+            <td> {{ cont.mr_cm_num__cm_phone }} </td>
+            <td> {{ cont.mr_year }} </td>
+            <td> {{ cont.mr_term }} </td>
+            <td> {{ cont.mr_trans_date|date:'d-M-Y' }} </td>
+            <td> {{ cont.mr_dr_cr }} </td>
+            <td> {{ cont.mr_aamount|floatformat:2 }} </td>
+            <td><a href="{% url 'editmembrec' cont.mr_num %}">  View </a></td>
+            <td><a href="{% url 'memberpay' cont.mr_num %}">  Payment </a></td>
+
+        </tr>
+        {% endfor %}
+
+    </tbody>
+
+    </table>
+     </nav>
+      </div>
+
+ </aside> </div>
+</body>
+{% endblock %}
+</html>

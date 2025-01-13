@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+
+<body>{% block content %}
+
+<br>
+<br>
+<br>
+
+School Classes
+
+<br>
+<br>
+  <form style="margin-left:2.5em" method="get">
+    {{ filter.form.as_p }}
+
+    <button type="submit">Search</button>
+  </form>
+
+<div> <aside id="rightsidebar">
+    <div class="col-md-10 col-xs-10 col-sm-10">
+    <nav id="nav">
+
+      <br>
+      Total Number     :  {{ total_num.TotNum|floatformat:0 }} <br>
+      <br>
+
+    <table class="content" border="2px">
+    <thead>
+     <tr>
+        <th>Level</th>
+        <th>Class</th>
+        <th>Staff Member</th>
+        <th>Type</th>
+        <th>Status</th>
+        <th>Class Code</th>
+        <th>Daily Plan</th>
+        <th>Assessment</th>
+        <th>Register</th>
+
+     </tr>
+   </thead>
+
+    <tbody>
+        <tr>
+        {% for clss in filter.qs %}
+            <td> {{ clss.sc_lv_code__lv_name }} </td>
+            <td> {{ clss.sc_desc }} </td>
+            <td> {{ clss.sc_sf_num__sf_surname }} </td>
+            <td> {{ clss.sc_type }} </td>
+            <td> {{ clss.sc_status }} </td>
+            <td><a href="{% url 'classlevel' clss.sc_code %}"> {{ clss.sc_code }}  </a> </td>
+            <td><a href="{% url 'dayplanlist' clss.sc_code %}">  Daily Plan  </a>  </td>
+            <td><a href="{% url 'classassessmentlist' clss.sc_code %}">  Assessment  </a>  </td>
+            <td><a href="{% url 'memberregister' clss.sc_code %}">  Register  </a>  </td>
+
+        </tr>
+        {% endfor %}
+
+    </tbody>
+
+    </table>
+     </nav>
+      </div>
+
+ </aside> </div>
+</body>
+{% endblock %}
+</html>

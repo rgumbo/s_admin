@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+
+<body>{% block content %}
+
+<br>
+<br>
+<br>
+
+My Stocks
+
+<br>
+<br>
+  <form style="margin-left:2.5em" method="get">
+    {{ filter.form.as_p }}
+
+    <button type="submit">Search</button>
+  </form>
+
+<div> <aside id="rightsidebar">
+    <div class="col-md-10 col-xs-10 col-sm-10">
+    <nav id="nav">
+
+      <br>
+      <br>
+      Total Qty     :  {{ total_qty.TotQty|floatformat:2 }} <br> <br>
+      Total Value   :  {{ total_val.TotVal|floatformat:2}}
+      <br>
+      <br>
+
+    <table class="content" border="2px">
+    <thead>
+     <tr>
+
+        <th>Store</th>
+        <th>Stock Type</th>
+        <th>Item Code</th>
+        <th>Stock Item</th>
+        <th>Quantity</th>
+        <th>Value</th>
+
+     </tr>
+   </thead>
+
+    <tbody>
+        <tr>
+        {% for ord in filter.qs %}
+            <td> {{ ord.si_sn_code__sn_name }} </td>
+            <td> {{ ord.si_st_code__st_name }} </td>
+            <td> {{ ord.si_code }} </td>
+            <td> {{ ord.si_name }} </td>
+            <td> {{ ord.sum_qty|floatformat:2 }} </td>
+            <td> {{ ord.sum_value|floatformat:2 }} </td>
+
+        </tr>
+        {% endfor %}
+
+    </tbody>
+
+
+    </table>
+     </nav>
+      </div>
+
+ </aside> </div>
+</body>
+{% endblock %}
+</html>

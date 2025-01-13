@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+
+<body>{% block content %}
+
+<br>
+<br>
+<br>
+
+Individual Assessments Listing
+
+<br>
+<br>
+  <form style="margin-left:2.5em" method="get">
+    {{ filter.form.as_p }}
+
+    <button type="submit">Search</button>
+  </form>
+
+<div> <aside id="rightsidebar">
+    <div class="col-md-10 col-xs-10 col-sm-10">
+    <nav id="nav">
+
+      <br>
+      Total Number : {{ total_num.TotNum|floatformat:2 }}
+      <br>
+      Top Mark     : {{ max_mark.MaxMark|floatformat:2 }}
+      <br>
+      Average Mark : {{ avg_mark.AvgMark|floatformat:2 }}
+      <br>
+      Low Mark     : {{ min_mark.MinMark|floatformat:2 }}
+      <br>
+      <br>
+
+    <table class="content" border="2px">
+    <thead>
+     <tr>
+
+        <th>Assessment</th>
+        <th>Number</th>
+        <th>Type</th>
+        <th>Surname</th>
+        <th>Name</th>
+        <th>Class</th>
+        <th>Mark (F)</th>
+        <th>Mark (A)</th>
+        <th>Grade (F)</th>
+        <th>Grade (A)</th>
+        <th>Status</th>
+        <th>Edit</th>
+
+     </tr>
+   </thead>
+
+    <tbody>
+        <tr>
+        {% for clss in filter.qs %}
+
+            <td> {{ clss.la_as_num__as_name }} </td>
+            <td> {{ clss.la_num }} </td>
+            <td> {{ clss.la_type }} </td>
+            <td> {{ clss.la_cm_num__cm_surname }} </td>
+            <td> {{ clss.la_cm_num__cm_fname }} </td>
+            <td> {{ clss.la_sc_code__sc_desc }} </td>
+            <td> {{ clss.la_mark_f }} </td>
+            <td> {{ clss.la_mark_a }} </td>
+            <td> {{ clss.la_grade_f }} </td>
+            <td> {{ clss.la_grade_a }} </td>
+            <td> {{ clss.as_status }} </td>
+            <td><a href="{% url 'editlearnerassessment' clss.la_num %}">  Edit   </a>  </td>
+
+        </tr>
+        {% endfor %}
+
+    </tbody>
+
+
+    </table>
+     </nav>
+      </div>
+
+ </aside> </div>
+</body>
+{% endblock %}
+</html>

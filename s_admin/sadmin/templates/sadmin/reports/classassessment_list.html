@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+
+<body>{% block content %}
+
+<br>
+<br>
+<br>
+
+Assessments Listing
+
+<br>
+<br>
+  <form style="margin-left:2.5em" method="get">
+    {{ filter.form.as_p }}
+
+    <button type="submit">Search</button>
+  </form>
+
+<div> <aside id="rightsidebar">
+    <div class="col-md-10 col-xs-10 col-sm-10">
+    <nav id="nav">
+
+      <br>
+      Total Number     :  {{ total_num.TotNum|floatformat:0 }} <br>
+      <br>
+
+    <table class="content" border="2px">
+    <thead>
+     <tr>
+
+        <th>Assessment</th>
+        <th>Scheme</th>
+        <th>Date</th>
+        <th>Class</th>
+        <th>Name</th>
+        <th>Subject</th>
+        <th>Class</th>
+        <th>Type</th>
+        <th>Satus</th>
+        <th>Edit</th>
+
+     </tr>
+   </thead>
+
+    <tbody>
+        <tr>
+        {% for clss in filter.qs %}
+
+            <td> {{ clss.as_num }} </td>
+            <td> {{ clss.as_ch_num }} </td>
+            <td> {{ clss.as_trans_date|date:'D-M-Y' }} </td>
+            <td> {{ clss.as_sc_code__sc_desc }} </td>
+            <td> {{ clss.as_name }} </td>
+            <td> {{ clss.as_sb_code__sb_desc }} </td>
+            <td> {{ clss.as_lc_num__lc_desc }} </td>
+            <td> {{ clss.as_type }} </td>
+            <td> {{ clss.as_status }} </td>
+            <td><a href="{% url 'editclassassessment' clss.as_num %}">  Edit   </a>  </td>
+            <td><a href="{% url 'learnerassesslist' clss.as_num %}">  Marks   </a>  </td>
+
+        </tr>
+        {% endfor %}
+
+    </tbody>
+
+
+    </table>
+     </nav>
+      </div>
+
+ </aside> </div>
+</body>
+{% endblock %}
+</html>

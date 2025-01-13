@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container-fluid">
+<div class="row"></div>
+<br/>
+<div class="row">
+ <div class="col-md-1 col-xs-1 col-sm-1">
+ </div>
+
+ <div class="col-md-8 col-xs-8 col-sm-8">
+  <p class="h2"> Code         : {{classmember.cm_sc_code}}</p>
+  <p class="h2"> Desc         : {{classmember.cm_surname}}</p>
+  <p class="h2"> Use Type     : {{classmember.cm_fname}}</p>
+  <p class="h2"> Size         : {{classmember.cm_Guardian}}</p>
+  <p class="h2"> Planned Size : {{classmember.cm_dob}}</p>
+  <p class="h2"> Actual Size  : {{classmember.cm_doj}}</p>
+  <p class="h2"> Target Qty   : {{classmember.cm_dol}}</p>
+
+  </div>
+
+<div class="row"> </div>
+ <div class="col-md-1 col-xs-1 col-sm-1"></div>
+ <div class="col-md-10 col-xs-10 col-sm-10">
+
+ </div>
+ <div class="col-md-1 col-xs-1 col-sm-1"></div>
+</div>
+</div>
+{% endblock %}

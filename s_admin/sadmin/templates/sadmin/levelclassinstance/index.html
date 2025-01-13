@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container-fluid">
+ <div class="row">
+  <div class="col-md-1 col-xs-1 col-sm-1"></div>
+   <div  class="col-md-10 col-xs-10 col-sm-10">
+    <h3 class="round3" style="text-align:center;">Districts</h3>
+  </div>
+  <div class="col-md-1 col-xs-1 col-sm-1"></div>
+ </div>
+ <div class="row">
+
+ </div>
+ <br/>
+ {% for district in District_list %}
+  <div class="row">
+   <div class="col-md-1 col-xs-1 col-sm-1"></div>
+   <div class="col-md-7 col-xs-7 col-sm-7">
+    <ul class="list-group">
+       <li class="list-group-item ">
+     <a href="{% url 'addward' district.pk %}">{{ district.dt_code }}- {{ district.dt_name }} </a>
+       </a>  <span class="badge"></span>
+    </li>
+     </ul>
+    <br>
+   </div>
+
+   <div class="col-md-1">
+    <a href="{% url 'editdistrict' district.pk %}">
+     <button type="button" class="btn btn-info">
+      <span class="glyphicon glyphicon-pencil"></span> Edit
+     </button>
+    </a>
+   </div>
+
+   <div class="col-md-1">
+    <a href="{% url 'ward' district.pk %}">
+     <button type="button" class="btn btn-info">
+      <span class="glyphicon glyphicon-envelope"></span>Wards
+     </button>
+    </a>
+   </div>
+
+   <div class="col-md-1 col-xs-1 col-sm-1"></div>
+  </div>
+ {% endfor %}
+</div>
+{% endblock %}

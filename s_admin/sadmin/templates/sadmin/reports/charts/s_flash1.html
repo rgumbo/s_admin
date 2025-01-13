@@ -1,0 +1,44 @@
+<div id="container"></div>
+<script src="https://code.highcharts.com/highcharts.src.js"></script>
+<script>
+  Highcharts.chart('container', {
+      chart: {
+          type: 'column'
+      },
+      title: {
+          text: 'Project Spot Flash'
+      },
+      xAxis: {
+          categories: [
+            {% for entry in dataset %}'{{ entry.ac_hi_num__hi_code }} '{% if not forloop.last %}, {% endif %}{% endfor %}
+          ]
+      },
+      series: [{
+          name: 'Starting Units',
+          data: [
+            {% for entry in dataset %}{{ entry.tot_num }}{% if not forloop.last %}, {% endif %}{% endfor %}
+          ],
+          color: 'green'
+      }, {
+          name: 'Mortality',
+          data: [
+            {% for entry in dataset %}{{ entry.mort_sum }}{% if not forloop.last %}, {% endif %}{% endfor %}
+          ],
+          color: 'red'
+      },
+{
+          name: 'Closing Units',
+          data: [
+            {% for entry in dataset %}{{ entry.avail_sum }}{% if not forloop.last %}, {% endif %}{% endfor %}
+          ],
+          color: 'purple'
+      },
+{
+          name: 'Average Wgt',
+          data: [
+            {% for entry in dataset %}{{ entry.wgt_sum }}{% if not forloop.last %}, {% endif %}{% endfor %}
+          ],
+          color: 'orange'
+      }]
+  });
+</script>

@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container-fluid">
+<div class="row"></div>
+<br/>
+<div class="row">
+ <div class="col-md-1 col-xs-1 col-sm-1">
+    </div>
+ <div class="col-md-8 col-xs-8 col-sm-8">
+  <p class="h2"> Facility  : {{slot.sp_fs_num}}</p>
+  <p class="h2"> Desc      : {{slot.sp_desc}}</p>
+  <p class="h2"> Duration  : {{slot.sp_hrs}}</p>
+  <p class="h2"> From Time : {{slot.sp_fromtime}}</p>
+  <p class="h2"> To Time   : {{slot.sp_totime}}</p>
+  <p class="h2"> Status    : {{slot.sp_status}}</p>
+
+ </div>
+
+<div class="row"> </div>
+ <div class="col-md-1 col-xs-1 col-sm-1"></div>
+ <div class="col-md-10 col-xs-10 col-sm-10">
+
+ </div>
+ <div class="col-md-1 col-xs-1 col-sm-1"></div>
+</div>
+</div>
+{% endblock %}

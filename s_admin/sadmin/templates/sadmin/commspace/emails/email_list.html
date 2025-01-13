@@ -1,0 +1,24 @@
+{% extends 'starnec/base1.html' %}
+
+{% block content %}
+  <form method="get">
+    {{ filter.form.as_p }}
+
+    <button type="submit">Search</button>
+  </form>
+
+  <div class="col-md-10 col-xs-10 col-sm-10">
+  <ul>
+  {% for email in filter.qs %}
+      Number :<a href="{% url 'sendemail' email.el_num %}"> {{ email.el_num }} </a>  <span class="badge"></span>
+   <p>Date Created	: {{ email.el_type }} </p>
+   <p>Email Type	: {{ email.ad_date_c }} </p>
+   <p>Email Subject	: {{ email.el_subject }} </p>
+   <p>Email Status	: {{ email.el_status }} </p>
+
+  {% endfor %}
+  </ul>
+
+  </div>
+
+{% endblock %}

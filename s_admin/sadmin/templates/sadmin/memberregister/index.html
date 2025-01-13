@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container-fluid">
+ <div class="row">
+  <div class="col-md-1 col-xs-1 col-sm-1"></div>
+   <div  class="col-md-10 col-xs-10 col-sm-10">
+    <h3 class="round3" style="text-align:center;">Student Register</h3>
+  </div>
+  <div class="col-md-1 col-xs-1 col-sm-1"></div>
+ </div>
+ <div class="row">
+  <div class="col-md-10 col-xs-10 col-sm-10"></div>
+
+ </div>
+ <br/>
+ {% for reg in MemberRegister_list %}
+  <div class="row">
+   <div class="col-md-1 col-xs-1 col-sm-1"></div>
+   <div class="col-md-7 col-xs-7 col-sm-7">
+    <ul class="list-group">
+       <li class="list-group-item ">
+     <a href="{% url 'editmemberregister' reg.pk %}">{{ reg.mr_date }}-{{ reg.mr_day }}-{{ reg.mr_sc_code }}-
+              {{ reg.mr_cm_num }}-{{ reg.mr_mark }}-{{ reg.mr_status }}</a>
+
+        <span class="badge"></span>
+    </li>
+     </ul>
+    <br>
+   </div>
+
+  <div class="col-md-1">
+    <a href="{% url 'editmemberregister' reg.pk %}">
+     <button type="button" class="btn btn-info">
+      <span class="glyphicon glyphicon-pencil"></span> Register
+     </button>
+    </a>
+  </div>
+
+   <div class="col-md-1">
+    <a href="{% url 'memberregister' reg.pk %}">
+     <button type="button" class="btn btn-info">
+      <span class="glyphicon glyphicon-list"></span> Register
+     </button>
+    </a>
+   </div>
+
+   <div class="col-md-1 col-xs-1 col-sm-1"></div>
+  </div>
+ {% endfor %}
+</div>
+{% endblock %}

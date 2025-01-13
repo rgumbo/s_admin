@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container-fluid">
+<div class="row"></div>
+<br/>
+<div class="row">
+ <div class="col-md-1 col-xs-1 col-sm-1">
+    </div>
+ <div class="col-md-8 col-xs-8 col-sm-8">
+  <p class="h2"> Number       : {{ term.tp_num }}</p>
+  <p class="h2"> Year         : {{ term.tp_year }}</p>
+  <p class="h2"> Term         : {{ term.tp_term }}</p>
+  <p class="h2"> No. of Weeks : {{ term.tp_weeks }}</p>
+  <p class="h2"> No. of Days  : {{ term.tp_days }}</p>
+  <p class="h2"> Opening Day  : {{ term.tp_start_date }}</p>
+  <p class="h2"> Closing Day  : {{ term.tp_end_date }}</p>
+    </div>
+
+<div class="row"> </div>
+ <div class="col-md-1 col-xs-1 col-sm-1"></div>
+ <div class="col-md-10 col-xs-10 col-sm-10">
+
+ </div>
+ <div class="col-md-1 col-xs-1 col-sm-1"></div>
+</div>
+</div>
+{% endblock %}

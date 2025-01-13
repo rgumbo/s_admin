@@ -1,0 +1,114 @@
+
+def HoldingInstanceView(request, pk):
+    holding = Holding.objects.get(pk=pk)
+
+    new_holdinginstance = None
+    if request.method == 'POST':
+
+        form = HoldingInstanceForm(data=request.POST or None)
+
+        if form.is_valid():
+            # Create a Holding Instance object but don't save to database yet
+            new_holdinginstance = form.save(commit=False)
+            new_holdinginstance.hi_hd_num = holding
+
+            new_holdinginstance.save()
+
+            l_ac_date = form.cleaned_data['hi_start_date']
+            no_of_days = form.cleaned_data['hi_days']
+            l_hi_code = form.cleaned_data['hi_code']
+
+
+            print(l_ac_date)
+
+            # Begin Iterating for the days the activities will run
+            l_ac_date = form.cleaned_data['hi_start_date']
+            no_of_days = form.cleaned_data['hi_days']
+            #l_hi_code = form.cleaned_data['hi_code']
+
+            #holdinginstance = HoldingInstance.objects.filter(hi_code=l_hi_code) #.first()
+            holdinginstance = HoldingInstance.objects.get(hi_code=l_hi_code)
+
+            l_ac_type = '7'
+            l_ac_day = 0
+            #l_ac_date = "24/03/26"
+            l_ac_o_qty = 0
+            l_ac_c_qty = 0
+            l_ac_t_wqt = 0
+            l_ac_a_wqt = 0
+            l_ac_morlity = 0
+            l_ac_e_cost = 0
+            l_ac_desc = 'None'
+            l_ac_status = '1'
+            l_ac_remark = 'None'
+
+            #no_of_days = 35
+            cnt = 0
+
+            while cnt <= no_of_days:
+                c_activity = Activity()
+                c_activity.ac_hi_num   =  holdinginstance
+                c_activity.ac_type = l_ac_type
+                c_activity.ac_day = l_ac_day
+                c_activity.ac_date = l_ac_date
+                c_activity.ac_o_qty = l_ac_o_qty
+                c_activity.ac_c_qty = l_ac_c_qty
+                c_activity.ac_t_wqt = l_ac_t_wqt
+                c_activity.ac_a_wqt = l_ac_a_wqt
+                c_activity.ac_morlity = l_ac_morlity
+                c_activity.ac_e_cost = l_ac_e_cost
+                c_activity.ac_desc = l_ac_desc
+                c_activity.ac_status = l_ac_status
+                c_activity.ac_remark = l_ac_remark
+
+                c_activity.ac_pstart_date = l_ac_date
+                c_activity.ac_pend_date = l_ac_date
+                c_activity.ac_astart_date = l_ac_date
+                c_activity.ac_aend_date = l_ac_date
+
+                c_activity.save()
+
+                l_ac_day = l_ac_day + 1
+                cnt     = (cnt + 1)
+                l_ac_date = l_ac_date + datetime.timedelta(days=1)
+                print(l_ac_day)
+                print(cnt)
+
+            messages.success(request, "Holding Instance created successfully")
+        return redirect('holding')
+    else:
+        form = HoldingInstanceForm()
+    return render(request, 'chicks/holdinginstance/holdinginstance.html', {'form': form})
+
+***************************************************************************************************************
+***************************************************************************************************************
+
+  levelclass = LevelClass.objects.get(lc_num=pk)
+
+
+    lc_num    = levelclass
+    l_sc_code = levelclass.lc_sc_code
+    l_lv_code = levelclass.lc_lv_code
+    l_sb_code = levelclass.lc_sb_code
+    l_sf_num  = levelclass.lc_sf_num
+    l_type    = levelclass.lc_type
+
+            while cnt <= no_of_weeks:
+                c_scheme = Schemes()
+
+                c_scheme.ch_lc_num   = levelclass
+                c_scheme.ch_sc_code  = l_sc_code
+                c_scheme.ch_sf_num   = l_sf_num
+                c_scheme.ch_lv_code  = l_lv_code
+                c_scheme.ch_sb_code  = l_sb_code
+                c_scheme.ch_sy_code  = l_sy_code
+                c_scheme.ch_ex_board = l_ex_board
+                c_scheme.ch_week     = l_week
+                c_scheme.ch_status   = l_status
+
+                c_scheme.save()
+
+                l_week = l_week + 1
+                cnt     = (cnt + 1)
+                l_ac_date = l_ac_date + datetime.timedelta(days=1)
+

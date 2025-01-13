@@ -1,0 +1,32 @@
+<div id="container"></div>
+<script src="https://code.highcharts.com/highcharts.src.js"></script>
+<script>
+  Highcharts.chart('container', {
+      chart: {
+          type: 'column'
+      },
+      title: {
+          text: 'Holdings Spot Flash'
+      },
+      xAxis: {
+          categories: [
+            {% for entry in dataset %}'{{ entry.hd_rg_code__rg_name }} '{% if not forloop.last %}, {% endif %}{% endfor %}
+          ]
+      },
+      series: [{
+          name: 'Holdings',
+          data: [
+            {% for entry in dataset %}{{ entry.num_hold }}{% if not forloop.last %}, {% endif %}{% endfor %}
+          ],
+          color: 'purple'
+      },
+      {
+          name: 'Land Available',
+          data: [
+            {% for entry in dataset %}{{ entry.tot_land }}{% if not forloop.last %}, {% endif %}{% endfor %}
+          ],
+          color: 'brown'
+      },
+    ]
+  });
+</script>

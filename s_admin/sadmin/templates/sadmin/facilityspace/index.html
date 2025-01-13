@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container-fluid">
+ <div class="row">
+  <div class="col-md-1 col-xs-1 col-sm-1"></div>
+   <div  class="col-md-10 col-xs-10 col-sm-10">
+    <h3 class="round3" style="text-align:center;">Facility Space</h3>
+  </div>
+  <div class="col-md-1 col-xs-1 col-sm-1"></div>
+ </div>
+ <div class="row">
+  <div class="col-md-10 col-xs-10 col-sm-10"></div>
+  <div class="col-md-2 col-xs-1 col-sm-1">
+   <br/>
+
+  </div>
+ </div>
+ <br/>
+ {% for f_space in FacilitySpace_list %}
+  <div class="row">
+   <div class="col-md-1 col-xs-1 col-sm-1"></div>
+   <div class="col-md-7 col-xs-7 col-sm-7">
+    <ul class="list-group">
+       <li class="list-group-item ">
+     <a href="{% url 'spaceslot' f_space.pk %}">{{ f_space.fs_num}}-{{ f_space.fs_desc}}-{{ f_space.fs_fc_num}}
+         - {{ f_space.fs_status}} </a>  <span class="badge"></span>
+    </li>
+     </ul>
+    <br>
+   </div>
+
+   <div class="col-md-1">
+    <a href="{% url 'editfacilityspace' f_space.pk %}">
+     <button type="button" class="btn btn-info">
+      <span class="glyphicon glyphicon-pencil"></span>
+     </button>
+    </a>
+   </div>
+
+   <div class="col-md-1">
+    <a href="{% url 'addspaceslot' f_space.pk%}">
+     <button type="button" class="btn btn-info">
+      <span class="glyphicon glyphicon-plus"></span> Slot
+     </button>
+    </a>
+   </div>
+
+    <div class="col-md-1">
+    <a href="{% url 'spaceslot' f_space.pk%}">
+     <button type="button" class="btn btn-info">
+      <span class="glyphicon glyphicon-list"></span> Slot
+     </button>
+    </a>
+   </div>
+
+   <div class="col-md-1 col-xs-1 col-sm-1"></div>
+  </div>
+ {% endfor %}
+</div>
+{% endblock %}

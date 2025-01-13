@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+
+<body>{% block content %}
+
+<br>
+<br>
+<br>
+
+Holdings Summaries
+
+<br>
+<br>
+  <form style="margin-left:2.5em" method="get">
+    {{ filter.form.as_p }}
+
+<!--  <label for="period">Transaction Listing:</label>
+  <input type="number" id="period" name="period"><br><br> -->
+
+    <button type="submit">Search</button>
+  </form>
+
+<div> <aside id="rightsidebar">
+    <div class="col-md-10 col-xs-10 col-sm-10">
+    <nav id="nav">
+
+       <br>
+      Total Holdings                :  {{ total_hold.TotHold }}
+      <br>
+      Total Projects                :  {{ total_inst.TotInst }}
+      <br>
+      Total Area             	    :  {{ total_land.TotLand }}
+      <br>
+      Total T. Output               :  {{ total_qty.TotQty }}
+      <br>
+      <br>
+
+    <table class="content" border="2px">
+    <thead>
+     <tr>
+        <th>Region</th>
+        <th>Holdings</th>
+        <th>Projects</th>
+        <th>Land Area</th>
+        <th>Target Output</th>
+
+     </tr>
+  </thead>
+
+    <tbody>
+        <tr>
+        {% for ord in filter.qs %}
+            <td> {{ord.mm_rg_code__to_name|stringformat:".3f"}} </td>
+            <td> {{ord.num_hold|floatformat:0}} </td>
+            <td> {{ord.num_inst|floatformat:0}} </td>
+            <td> {{ord.tot_land|floatformat:0}} </td>
+            <td> {{ord.tot_qty|floatformat:0}} </td>
+        </tr>
+        {% endfor %}
+
+    </tbody>
+
+
+    </table>
+     </nav>
+      </div>
+
+ </aside> </div>
+</body>
+{% endblock %}
+</html>

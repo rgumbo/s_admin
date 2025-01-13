@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container-fluid">
+ <div class="row">
+  <div class="col-md-1 col-xs-1 col-sm-1"></div>
+   <div  class="col-md-10 col-xs-10 col-sm-10">
+    <h3 class="round3" style="text-align:center;">Assessment</h3>
+  </div>
+  <div class="col-md-1 col-xs-1 col-sm-1"></div>
+ </div>
+ <div class="row">
+  <div class="col-md-10 col-xs-10 col-sm-10"></div>
+  <div class="col-md-2 col-xs-1 col-sm-1">
+   <br/>
+
+  </div>
+ </div>
+ <br/>
+ {% for assessment in ClassAssessment_list %}
+  <div class="row">
+   <div class="col-md-1 col-xs-1 col-sm-1"></div>
+   <div class="col-md-7 col-xs-7 col-sm-7">
+    <ul class="list-group">
+       <li class="list-group-item ">
+     <a href="{% url 'editclassassessment' assessment.pk %}">{{assessment.as_trans_date}}-{{assessment.as_sc_code}}-{{assessment.as_ch_num}}-{{assessment.as_sb_code}}-
+                      {{assessment.as_name}}-{{assessment.as_remark}}-{{assessment.as_comment}}-
+                      {{assessment.as_review}}-{{assessment.as_status}}</a>  <span class="badge"></span>
+    </li>
+     </ul>
+    <br>
+   </div>
+
+   <div class="col-md-1">
+    <a href="{% url 'editclassassessment' assessment.pk %}"> Edit
+     <button type="button" class="btn btn-info">
+      <span class="glyphicon glyphicon-pencil"></span>
+     </button>
+    </a>
+   </div>
+
+   <div class="col-md-1">
+    <a href="{% url 'addlearnerassessment' assessment.pk %}">
+     <button type="button" class="btn btn-info">
+      <span class="glyphicon glyphicon-plus"></span>Student
+     </button>
+    </a>
+   </div>
+
+   <div class="col-md-1">
+    <a href="{% url 'learnerassessment' assessment.pk %}">
+     <button type="button" class="btn btn-info">
+      <span class="glyphicon glyphicon-list"></span>Student
+     </button>
+    </a>
+   </div>
+
+   <div class="col-md-1 col-xs-1 col-sm-1"></div>
+  </div>
+ {% endfor %}
+</div>
+{% endblock %}

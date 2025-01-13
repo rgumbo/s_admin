@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+
+<body>{% block content %}
+
+<br>
+<br>
+<br>
+
+Day Plans Listing
+
+<br>
+  <form style="margin-left:2.5em" method="get">
+    {{ filter.form.as_p }}
+
+    <button type="submit">Search</button>
+  </form>
+
+<div> <aside id="rightsidebar">
+    <div class="col-md-10 col-xs-10 col-sm-10">
+    <nav id="nav">
+
+      <br>
+      <br>
+      Total Number     :  {{ total_num.TotNum|floatformat:0 }} <br> <br>
+      <br>
+
+    <table class="content" border="2px">
+
+    <thead>
+     <tr>
+        <th>Day Plan</th>
+        <th>P. Date</th>
+        <th>Del. Date</th>
+        <th>Cycle</th>
+        <th>Day</th>
+        <th>Class</th>
+        <th>Subject</th>
+        <th>Hours</th>
+        <th>Start Time</th>
+        <th>Finish Time</th>
+        <th>Area</th>
+        <th>Rating</th>
+        <th>Edit</th>
+     </tr>
+
+   </thead>
+    <tbody>
+        <tr>
+        {% for clss in filter.qs %}
+            <td> {{ clss.sp_num }} </td>
+            <td> {{ clss.sp_plan_date|date:'d-M-Y' }} </td>
+            <td> {{ clss.sp_del_date|date:'d-M-Y' }} </td>
+            <td> {{ clss.sp_cycle }} </td>
+            <td> {{ clss.sp_day }} </td>
+            <td> {{ clss.sp_sc_code__sc_desc }} </td>
+            <td> {{ clss.sp_sb_code__sb_desc }} </td>
+            <td> {{ clss.sp_hrs }} </td>
+            <td> {{ clss.sp_start_time }} </td>
+            <td> {{ clss.sp_finish_time }} </td>
+            <td> {{ clss.sp_area }} </td>
+            <td> {{ clss.sp_absorption }} </td>
+            <td><a href="{% url 'editdailyplan' clss.sp_num %}">  Edit   </a>  </td>
+        </tr>
+        {% endfor %}
+
+    </tbody>
+
+
+    </table>
+     </nav>
+      </div>
+
+ </aside> </div>
+</body>
+{% endblock %}
+</html>

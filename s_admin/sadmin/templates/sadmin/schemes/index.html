@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container-fluid">
+ <div class="row">
+  <div class="col-md-1 col-xs-1 col-sm-1"></div>
+   <div  class="col-md-10 col-xs-10 col-sm-10">
+    <h3 class="round3" style="text-align:center;">Schemes</h3>
+  </div>
+  <div class="col-md-1 col-xs-1 col-sm-1"></div>
+ </div>
+ <div class="row">
+  <div class="col-md-10 col-xs-10 col-sm-10"></div>
+
+ </div>
+ <br/>
+ {% for schemes in Schemes_list %}
+  <div class="row">
+   <div class="col-md-1 col-xs-1 col-sm-1"></div>
+   <div class="col-md-7 col-xs-7 col-sm-7">
+    <ul class="list-group">
+       <li class="list-group-item ">
+     <a href="{% url 'editschemes' schemes.pk %}">{{ schemes.ch_num }}-{{ schemes.ch_lc_num }}-
+      {{ schemes.ch_sb_code }}-{{ schemes.ch_sy_code }}-{{ schemes.ch_week }}-{{ schemes.ch_topic }}
+      -{{ schemes.ch_objectives }}</a>
+
+        <span class="badge"></span>
+    </li>
+     </ul>
+    <br>
+   </div>
+
+  <div class="col-md-1">
+    <a href="{% url 'adddailyplan' schemes.pk %}">
+     <button type="button" class="btn btn-info">
+      <span class="glyphicon glyphicon-plus"></span> Daily Plan
+     </button>
+    </a>
+  </div>
+
+   <div class="col-md-1">
+    <a href="{% url 'dailyplan' schemes.pk %}">
+     <button type="button" class="btn btn-info">
+      <span class="glyphicon glyphicon-list"></span> Daily Plan
+     </button>
+    </a>
+   </div>
+
+   <div class="col-md-1">
+    <a href="{% url 'addclassassessment' schemes.pk %}">
+     <button type="button" class="btn btn-info">
+      <span class="glyphicon glyphicon-plus"></span> Tests
+     </button>
+    </a>
+   </div>
+
+   <div class="col-md-1">
+    <a href="{% url 'classassessment' schemes.pk %}">
+     <button type="button" class="btn btn-info">
+      <span class="glyphicon glyphicon-list"></span> Tests
+     </button>
+    </a>
+  </div>
+
+   <div class="col-md-1 col-xs-1 col-sm-1"></div>
+  </div>
+ {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container-fluid">
+<div class="row"></div>
+<br/>
+<div class="row">
+ <div class="col-md-1 col-xs-1 col-sm-1">
+ </div>
+
+ <div class="col-md-8 col-xs-8 col-sm-8">
+  <p class="h2"> Class     : {{levelclass.lc_sc_code}} </p>
+  <p class="h2"> Subject   : {{levelclass.lc_sb_code}} </p>
+  <p class="h2"> In Charge : {{levelclass.lc_sf_num}}  </p>
+  <p class="h2"> Hours     : {{levelclass.lc_hrs}}     </p>
+
+ </div>
+
+<div class="row"> </div>
+ <div class="col-md-1 col-xs-1 col-sm-1"></div>
+ <div class="col-md-10 col-xs-10 col-sm-10">
+
+ </div>
+ <div class="col-md-1 col-xs-1 col-sm-1"></div>
+</div>
+</div>
+{% endblock %}

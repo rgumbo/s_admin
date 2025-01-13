@@ -1,0 +1,1 @@
+C:\s_admin\sadmin\Scripts\activate

@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container-fluid">
+<div class="row"></div>
+<br/>
+<div class="row">
+ <div class="col-md-1 col-xs-1 col-sm-1">
+ </div>
+
+ <div class="col-md-8 col-xs-8 col-sm-8">
+  <p class="h2"> Class          : {{learner.la_sc_code}}</p>
+  <p class="h2"> Subject        : {{learner.la_lc_num}}</p>
+  <p class="h2"> Student        : {{learner.la_cm_num}}</p>
+  <p class="h2"> Assessment     : {{learner.la_as_num}}</p>
+  <p class="h2"> Forecast Mark  : {{learner.la_mark_f}}</p>
+  <p class="h2"> Forecast Grade : {{learner.la_grade_f}}</p>
+  <p class="h2"> Actual Mark    : {{learner.la_mark_a}}</p>
+  <p class="h2"> Actual Grade   : {{learner.la_grade_a}}</p>
+  <p class="h2"> Comment        : {{learner.la_comment}}</p>
+  <p class="h2"> Remark         : {{learner.la_remark}}</p>
+  <p class="h2"> Status         : {{learner.la_status}}</p>
+
+ </div>
+
+<div class="row"> </div>
+ <div class="col-md-1 col-xs-1 col-sm-1"></div>
+ <div class="col-md-10 col-xs-10 col-sm-10">
+
+ </div>
+ <div class="col-md-1 col-xs-1 col-sm-1"></div>
+</div>
+</div>
+{% endblock %}
