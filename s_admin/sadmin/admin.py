@@ -18,8 +18,8 @@ admin.site.register(Currency, CurrencyAdmin)
 
 # Define the TermParameter admin class
 class TermParameterAdmin(admin.ModelAdmin):
-    list_display = ('tp_num','tp_year','tp_term','tp_weeks','tp_period_len','tp_cycledays','tp_days','tp_start_date',
-                    'tp_end_date','tp_status','tp_schemed','tp_billed')
+    list_display = ('tp_num','tp_year','tp_term','tp_weeks','tp_period_len','tp_cycledays','tp_days',
+                    'tp_start_date','tp_seats','tp_end_date','tp_status','tp_schemed','tp_billed')
 
 # Register the TermParameter admin class with the associated model
 admin.site.register(TermParameter, TermParameterAdmin)
@@ -40,7 +40,7 @@ admin.site.register(Subject, SubjectAdmin)
 
 # Define the SchoolClass admin class
 class SchoolClassAdmin(admin.ModelAdmin):
-    list_display = ('sc_code','sc_sf_num','sc_lv_code','sc_type','sc_desc','sc_status')
+    list_display = ('sc_code','sc_seats','sc_sf_num','sc_lv_code','sc_type','sc_desc','sc_status')
 
 # Register the SchoolClass admin class with the associated model
 admin.site.register(SchoolClass, SchoolClassAdmin)
@@ -55,8 +55,8 @@ admin.site.register(LevelClass, LevelClassAdmin)
 
 # Define the ClassMember admin class
 class ClassMemberAdmin(admin.ModelAdmin):
-    list_display = ('cm_num','cm_sc_code','cm_lv_code','cm_surname','cm_fname','cm_otherName','cm_guardian',
-                    'cm_phone','cm_email','cm_dob','cm_doj','cm_dol','cm_status','cm_app_status')
+    list_display = ('cm_num','cm_sc_code','cm_year','cm_lv_code','cm_surname','cm_fname','cm_othername','cm_gender',
+                    'cm_guardian','cm_phone','cm_email','cm_dob','cm_doj','cm_dol','cm_status','cm_app_status')
 
 # Register the ClassMember admin class with the associated model
 admin.site.register(ClassMember, ClassMemberAdmin)

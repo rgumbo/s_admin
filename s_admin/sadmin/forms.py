@@ -30,8 +30,8 @@ class TermParameterForm(forms.ModelForm):
         class Meta:
             model = TermParameter
             # specify fields to be used
-            fields = ['tp_num','tp_year','tp_term','tp_weeks','tp_period_len','tp_cycledays','tp_days','tp_start_date',
-                      'tp_end_date','tp_status','tp_schemed','tp_billed']
+            fields = ['tp_num','tp_year','tp_term','tp_weeks','tp_period_len','tp_cycledays','tp_days','tp_seats',
+                      'tp_start_date','tp_end_date','tp_status','tp_schemed','tp_billed']
             widgets = {
                 'tp_start_date': widgets.DateInput(attrs={'type': 'date'}),
                 'tp_end_date': widgets.DateInput(attrs={'type': 'date'}),
@@ -59,8 +59,12 @@ class GenRegiserForm(forms.Form):
         f_year = forms.IntegerField()
         f_term = forms.IntegerField()
         Gen_ok = forms.ChoiceField(choices=comm_choices)
-
 class GenBillForm(forms.Form):
+        comm_choices = (("Y", "Proceed"), ("N", "Stop"))
+        f_year = forms.IntegerField()
+        f_term = forms.IntegerField()
+        Gen_ok = forms.ChoiceField(choices=comm_choices)
+class GenClassForm(forms.Form):
         comm_choices = (("Y", "Proceed"), ("N", "Stop"))
         f_year = forms.IntegerField()
         f_term = forms.IntegerField()
@@ -96,7 +100,7 @@ class SchoolClassForm(forms.ModelForm):
     class Meta:
         model = SchoolClass
         # specify fields to be used
-        fields = ['sc_code','sc_sf_num','sc_type','sc_desc','sc_status']
+        fields = ['sc_code','sc_seats','sc_sf_num','sc_type','sc_desc','sc_status']
         #widgets = {
          #   'ee_date_joined': widgets.DateInput(attrs={'type': 'date'}),
           #  'ee_dob': widgets.DateInput(attrs={'type': 'date'}),
@@ -120,12 +124,13 @@ class ClassMemberForm(forms.ModelForm):
     class Meta:
         model = ClassMember
         # specify fields to be used
-        fields = ['cm_num','cm_surname','cm_fname','cm_otherName','cm_guardian',
+        fields = ['cm_num','cm_year','cm_surname','cm_fname','cm_othername','cm_gender','cm_guardian',
                     'cm_phone','cm_email','cm_dob','cm_doj','cm_dol','cm_status','cm_app_status']
         widgets = {
             'cm_dob': widgets.DateInput(attrs={'type': 'date'}),
             'cm_doj': widgets.DateInput(attrs={'type': 'date'}),
             'cm_dol': widgets.DateInput(attrs={'type': 'date'}),
+            'cm_year': forms.HiddenInput(),
          }
 
 # Create the MemberRegister form class

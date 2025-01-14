@@ -31,7 +31,7 @@ from .models import Level,Subject,SchoolClass,LevelClass,ClassMember,LevelClassI
 from .forms import LevelForm,SubjectForm,SchoolClassForm,LevelClassForm,ClassMemberForm,LevelClassInstanceForm\
      ,DeptForm,StaffMemberForm,StaffSubjectForm,FacilityForm,FacilitySpaceForm,SpaceSlotForm,\
      ClassAssessmentForm,LearnerAssessmentForm,DailyPlanForm,SchemesForm,SyllabusForm,CurrencyForm,\
-     TermParameterForm,MemberRegisterForm,GenSchemeForm,GenRegiserForm,ClassBillingForm,SubjectBillingForm,\
+     TermParameterForm,MemberRegisterForm,GenSchemeForm,GenRegiserForm,GenClassForm,ClassBillingForm,SubjectBillingForm,\
      MemberRecordForm, ReceiptForm,GenBillForm,ContributionForm, BlogForm
 
 # Create your views here.
@@ -1715,7 +1715,6 @@ class GenBillView(View):
     def get(self, request, *args, **kwargs):
         form = self.form_class()
         return render(request, self.template_name, {'GenBillForm': form})
-
     def post(self, request, *args, **kwargs):
 
         form = self.form_class(request.POST)
@@ -1836,6 +1835,62 @@ class GenBillView(View):
 
             return redirect('genregister')
 
+        return render(request, self.template_name, {'GenRegiserForm': form})
+class GenSeatsView(View):
+    form_class = GenClassForm
+    template_name = 'sadmin/reports/genclass.html'
+
+    def get(self, request, *args, **kwargs):
+        form = self.form_class()
+        return render(request, self.template_name, {'GenClassForm': form})
+
+    def post(self, request, *args, **kwargs):
+
+        form = self.form_class(request.POST)
+        context = {'form': form}
+        if form.is_valid():
+            l_year = form.cleaned_data['f_year']
+            l_term = form.cleaned_data['f_term']
+            l_gen = form.cleaned_data['Gen_ok']
+
+            termparams = TermParameter.objects.get(tp_year=l_year, tp_term=l_term)
+
+            l_tp_year = termparams.tp_year
+            l_tp_term = termparams.tp_term
+            l_tp_weeks = termparams.tp_weeks
+            l_tp_seats = termparams.tp_seats
+            l_tp_period_len = termparams.tp_period_len
+            l_tp_days = termparams.tp_days
+            l_tp_start_date = termparams.tp_start_date
+            l_tp_end_date = termparams.tp_end_date
+            l_tp_status = termparams.tp_status
+            l_tp_schemed = termparams.tp_schemed
+
+            classquery = SchoolClass.objects.all().order_by('sc_code')
+
+            for c_query in classquery:
+
+                n_of_seats = 1
+
+                while n_of_seats <= l_tp_seats:
+                    c_memb = ClassMember()
+
+                    c_memb.cm_sc_code_id = c_query.sc_code
+                    c_memb.cm_lv_code = c_query.sc_lv_code
+                    c_memb.cm_year = l_year
+                    c_memb.cm_surname = 'X'
+                    c_memb.cm_fname = 'X'
+                    c_memb.cm_othername = 'X'
+                    c_memb.cm_guardian = 'X'
+                    c_memb.cm_phone = 'X'
+                    c_memb.cm_email = 'X'
+                    c_memb.cm_gender = 'F'
+
+                    c_memb.save()
+
+                    n_of_seats = (n_of_seats + 1)
+
+            return redirect('genclasseats')
         return render(request, self.template_name, {'GenRegiserForm': form})
 
 # Class member payment

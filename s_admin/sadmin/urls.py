@@ -184,6 +184,7 @@ urlpatterns = [
 
     path('genscheme', views.GenSchemeView.as_view(), name='genscheme'),
     path('genregister', views.GenRegisterView.as_view(), name='genregister'),
+    path('genclasseats', views.GenSeatsView.as_view(), name='genclasseats'),
 
     path('memberpay/<int:mr_num>/', views.MemberPayView,name='memberpay'),
     path('editmembrec/<int:mr_num>/', views.EditMemberRecordView, name='editmembrec'),
