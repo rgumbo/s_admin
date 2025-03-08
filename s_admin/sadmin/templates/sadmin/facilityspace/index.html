@@ -22,7 +22,7 @@
    <div class="col-md-7 col-xs-7 col-sm-7">
     <ul class="list-group">
        <li class="list-group-item ">
-     <a href="{% url 'spaceslot' f_space.pk %}">{{ f_space.fs_num}}-{{ f_space.fs_desc}}-{{ f_space.fs_fc_num}}
+     <a href="{% url 'spaceslot' f_space.pk %}">{{f_space.fs_num}}--{{ f_space.fs_fc_num}}--{{f_space.fs_desc}}
          - {{ f_space.fs_status}} </a>  <span class="badge"></span>
     </li>
      </ul>

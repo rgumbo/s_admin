@@ -4,7 +4,7 @@
  <div class="row">
   <div class="col-md-1 col-xs-1 col-sm-1"></div>
    <div  class="col-md-10 col-xs-10 col-sm-10">
-    <h3 class="round3" style="text-align:center;">Subjects xxx</h3>
+    <h3 class="round3" style="text-align:center;">Subjects</h3>
   </div>
   <div class="col-md-1 col-xs-1 col-sm-1"></div>
  </div>
@@ -38,22 +38,6 @@
     <a href="{% url 'editsubject' subject.pk %}">
      <button type="button" class="btn btn-info">
       <span class="glyphicon glyphicon-pencil"></span> Edit
-     </button>
-    </a>
-   </div>
-
-   <div class="col-md-1">
-    <a href="{% url 'addlevel' subject.pk %}">
-     <button type="button" class="btn btn-info">
-      <span class="glyphicon glyphicon-plus"></span>Level
-     </button>
-    </a>
-   </div>
-
-   <div class="col-md-1">
-    <a href="{% url 'level' subject.pk %}">
-     <button type="button" class="btn btn-info">
-      <span class="glyphicon glyphicon-list"></span>Level
      </button>
     </a>
    </div>

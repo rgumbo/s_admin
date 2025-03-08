@@ -1,7 +1,7 @@
 from django import forms
 from .models import Level,Subject,SchoolClass,LevelClass,ClassMember,LevelClassInstance,Dept,StaffMember,\
     StaffSubject,Facility,FacilitySpace,SpaceSlot,Schemes,DailyPlan,ClassAssessment,LearnerAssessment,\
-     MemberRegister,MemberRecord
+     MemberRegister,MemberRecord,AuthRelation,MemberMovement
 
 import django_filters
 #from decimal import Decimal
@@ -11,7 +11,7 @@ class SchoolClassFilter(django_filters.FilterSet):
 
     class Meta:
         model = SchoolClass
-        fields = ['sc_code', 'sc_lv_code', 'sc_sf_num', 'sc_type', 'sc_desc', 'sc_status']
+        fields = ['sc_code', 'sc_sl_code', 'sc_sf_num', 'sc_type', 'sc_desc', 'sc_status']
 
     def search_filter(self, queryset):
         return queryset.all() #filter(mr_gr_num=l_gr_num)
@@ -20,8 +20,7 @@ class SchemesFilter(django_filters.FilterSet):
 
     class Meta:
         model = Schemes
-        fields = ['ch_status','ch_sf_num','ch_lc_num','ch_sc_code','ch_lv_code',
-                  'ch_sb_code']
+        fields = ['ch_sl_code','ch_status','ch_sf_num','ch_week','ch_sc_code','ch_sb_code']
 
     def search_filter(self, queryset):
         return queryset.all() #filter(mr_gr_num=l_gr_num)
@@ -30,7 +29,7 @@ class DailyPlanFilter(django_filters.FilterSet):
 
     class Meta:
         model = DailyPlan
-        fields = ['sp_year','sp_term','sp_sb_code','sp_day','sp_cycle']
+        fields = ['sp_sl_code','sp_year','sp_term','sp_sc_code','sp_sb_code','sp_day','sp_cycle']
 
     def search_filter(self, queryset):
         return queryset.all() #filter(mr_gr_num=l_gr_num)
@@ -92,6 +91,10 @@ class ClassMemberFilter(django_filters.FilterSet):
         model = ClassMember
         fields = ['cm_sc_code', 'cm_lv_code', 'cm_surname']
 
+class MemberMvtFilter(django_filters.FilterSet):
+    class Meta:
+        model = MemberMovement
+        fields = ['mm_cm_num', 'mm_date', 'mm_dr_status', 'mm_pk_status']
 class LevelClassInstanceFilter(django_filters.FilterSet):
     class Meta:
         model = LevelClassInstance
@@ -122,6 +125,11 @@ class FacilitySpaceFilter(django_filters.FilterSet):
         model = FacilitySpace
         fields = ['fs_fc_num','fs_desc']
 
+class SpaceSlotFilter(django_filters.FilterSet):
+    class Meta:
+        model = SpaceSlot
+        fields = ['sp_fc_num','sp_fs_num','sp_sc_code','sp_sf_num',
+                   'sp_date','sp_day','sp_start_time','sp_finish_time','sp_status']
 class MembContFilter(django_filters.FilterSet):
 
     class Meta:
@@ -129,4 +137,4 @@ class MembContFilter(django_filters.FilterSet):
         fields = ['mr_year','mr_term','mr_sc_code__sc_desc','mr_cm_num__cm_fname','mr_cm_num__cm_guardian']
 
     def search_filter(self, queryset):
-        return queryset.filter(mr_gr_num=l_gr_num)
+        return queryset.filter(mr_gr_num=1) #l_gr_num)

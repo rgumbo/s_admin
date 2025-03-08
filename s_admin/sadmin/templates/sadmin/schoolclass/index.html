@@ -4,7 +4,7 @@
  <div class="row">
   <div class="col-md-1 col-xs-1 col-sm-1"></div>
    <div  class="col-md-10 col-xs-10 col-sm-10">
-    <h3 class="round3" style="text-align:center;">School Class xxxxx</h3>
+    <h3 class="round3" style="text-align:center;">School Class *******</h3>
   </div>
   <div class="col-md-1 col-xs-1 col-sm-1"></div>
  </div>
@@ -27,7 +27,7 @@
    </div>
    
    <div class="col-md-1">
-    <a href="{% url 'addlevelclass' schoolclass.pk %}">
+    <a href="{% url 'addclasssubject' schoolclass.pk %}">
      <button type="button" class="btn btn-info">
       <span class="glyphicon glyphicon-plus"></span> Subjects
      </button>
@@ -35,7 +35,7 @@
    </div>
 
    <div class="col-md-1">
-    <a href="{% url 'classlevel' schoolclass.pk %}">
+    <a href="{% url 'classsubject' schoolclass.sc_code %}">
      <button type="button" class="btn btn-info">
       <span class="glyphicon glyphicon-list"></span> Subjects
      </button>

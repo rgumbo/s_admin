@@ -30,28 +30,28 @@ School Classes
         <th>Level</th>
         <th>Class</th>
         <th>Staff Member</th>
-        <th>Type</th>
-        <th>Status</th>
-        <th>Class Code</th>
+        <th>View List</th>
+        <th>Add Member</th>
         <th>Daily Plan</th>
         <th>Assessment</th>
         <th>Register</th>
-
+        <th>Movement</th>
      </tr>
    </thead>
 
     <tbody>
         <tr>
+
         {% for clss in filter.qs %}
             <td> {{ clss.sc_lv_code__lv_name }} </td>
-            <td> {{ clss.sc_desc }} </td>
+            <td> {{ clss.sc_desc }}  </td>
             <td> {{ clss.sc_sf_num__sf_surname }} </td>
-            <td> {{ clss.sc_type }} </td>
-            <td> {{ clss.sc_status }} </td>
-            <td><a href="{% url 'classlevel' clss.sc_code %}"> {{ clss.sc_code }}  </a> </td>
-            <td><a href="{% url 'dayplanlist' clss.sc_code %}">  Daily Plan  </a>  </td>
+            <td><a href="{% url 'students' clss.sc_code %}">  List Class  </a>  </td>
+            <td><a href="{% url 'crreatestudent' clss.sc_code %}">  Add Students  </a>  </td>
+            <td><a href="{% url 'classplanlist' clss.sc_code %}">  Daily Plan  </a>  </td>
             <td><a href="{% url 'classassessmentlist' clss.sc_code %}">  Assessment  </a>  </td>
             <td><a href="{% url 'memberregister' clss.sc_code %}">  Register  </a>  </td>
+            <td><a href="{% url 'membermvt' clss.sc_code %}">  Movement  </a>  </td>
 
         </tr>
         {% endfor %}

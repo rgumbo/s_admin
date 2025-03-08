@@ -27,13 +27,13 @@ Schemes Listing - (Weeks)
         <th>Class</th>
         <th>Subject</th>
         <th>Scheme</th>
-        <th>Date</th>
+        <th>Effective Date</th>
         <th>Week</th>
         <th>Topic</th>
         <th>Objectives</th>
-        <th>Methods</th>
         <th>Evaluation</th>
         <th>Status</th>
+        <th>Class Plans</th>
      </tr>
    </thead>
 
@@ -44,13 +44,14 @@ Schemes Listing - (Weeks)
            <td> {{ clss.ch_sc_code__sc_desc }} </td>
            <td> {{ clss.ch_sb_code__sb_desc }} </td>
            <td><a href="{% url 'r_schemes' clss.ch_num %}">  {{ clss.ch_num }}   </a> </td>
-           <td> {{ clss.ch_eff_date|date:'D-M-Y' }} </td>
+           <td> {{ clss.ch_eff_date|date:'d-M-Y' }} </td>
            <td> {{ clss.ch_week }} </td>
            <td> {{ clss.ch_topic }} </td>
            <td> {{ clss.ch_objectives }} </td>
-           <td> {{ clss.ch_methods }} </td>
            <td> {{ clss.ch_evaluation }} </td>
            <td> {{ clss.ch_status }} </td>
+            <td><a href="{% url 'classplanlist' clss.ch_sc_code %}">  Class Plans  </a>  </td>
+
         </tr>
         {% endfor %}
 

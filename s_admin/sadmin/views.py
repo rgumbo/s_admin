@@ -2,7 +2,7 @@ from django.shortcuts import render
 
 from .filters import SchoolClassFilter,SchemesFilter,DailyPlanFilter,ClassAssessmentFilter,\
         LearnerAssessmentFilter,MemberRegisterFilter ,MembContFilter,SubjectFilter,SchoolClassFilter,\
-        StaffMemberFilter, FacilitySpaceFilter
+        StaffMemberFilter, FacilitySpaceFilter,ClassMemberFilter,SpaceSlotFilter,MemberMvtFilter
 
 import json
 from decimal import *
@@ -26,15 +26,23 @@ from django.views.generic import ListView, DetailView
 from .models import Level,Subject,SchoolClass,LevelClass,ClassMember,LevelClassInstance,Dept,StaffMember,\
     StaffSubject,Facility,FacilitySpace,SpaceSlot,ClassAssessment,LearnerAssessment,DailyPlan,Schemes,\
     Syllabus,Currency,MemberRegister,TermParameter,ClassBilling,SubjectBilling,MemberRecord, Receipt,BlogPost\
-    , PostContribution,PostCategory,PostOrigin,PostContribution
+    , PostContribution,PostCategory,PostOrigin,PostContribution,ExcludedDay,SchoolLevel,ClassSubject,\
+    AuthRelation , MemberMovement
 
 from .forms import LevelForm,SubjectForm,SchoolClassForm,LevelClassForm,ClassMemberForm,LevelClassInstanceForm\
      ,DeptForm,StaffMemberForm,StaffSubjectForm,FacilityForm,FacilitySpaceForm,SpaceSlotForm,\
      ClassAssessmentForm,LearnerAssessmentForm,DailyPlanForm,SchemesForm,SyllabusForm,CurrencyForm,\
      TermParameterForm,MemberRegisterForm,GenSchemeForm,GenRegiserForm,GenClassForm,ClassBillingForm,SubjectBillingForm,\
-     MemberRecordForm, ReceiptForm,GenBillForm,ContributionForm, BlogForm
+     MemberRecordForm, ReceiptForm,GenBillForm,ContributionForm, BlogForm,ExcludedDayForm,SchoolLevelForm,\
+     GenLevelForm,GenSpaceLotForm,MemberRegister1Form,MemberRegister2Form,MemberRegister3Form,MemberRegister4Form,\
+     MemberRegister5Form,MemberRegister6Form,MemberRegister7Form,MemberRegister8Form,\
+     MemberRegister9Form,MemberRegister10Form,ClassSubjectForm,AuthRelationForm , MemberMovementForm,\
+     GenMovementForm
 
 # Create your views here.
+
+global g_sb_num
+g_sb_num = 0
 
 #Index Templates
 
@@ -130,6 +138,9 @@ def SnapShotView(request):
     tot_hrs     = DailyPlan.objects.filter(sp_status='0').aggregate(num_hrs=Sum('sp_hrs'))
     tot_phrs    = DailyPlan.objects.filter(sp_status='1').aggregate(num_phrs=Sum('sp_hrs'))
 
+    tot_days     = DailyPlan.objects.filter(sp_status='0').aggregate(num_days=Count('sp_num'))
+    tot_pdays    = DailyPlan.objects.filter(sp_status='1').aggregate(num_pdays=Count('sp_num'))
+
     # Total Days   Total Absentees
     tot_present = MemberRegister.objects.filter(mr_mark='P').aggregate(num_p=Count('mr_num'))
     tot_absent  = MemberRegister.objects.filter(mr_mark='A').aggregate(num_a=Count('mr_num'))
@@ -151,6 +162,8 @@ def SnapShotView(request):
         'tot_pwks'    : tot_pwks,
         'tot_hrs'     : tot_hrs,
         'tot_phrs'    : tot_phrs,
+        'tot_days'    : tot_days,
+        'tot_pdays'   : tot_pdays,
         'tot_present' : tot_present,
         'tot_absent'  : tot_absent,
         'tot_sick'    : tot_sick,
@@ -198,6 +211,46 @@ def DeleteTermParameter(request, pk, template_name='sadmin/termparameter/confirm
         return redirect('termparameter')
     return render(request, template_name, {'object': termparameter})
 
+# home view for ExcludedDay. ExcludedDay are displayed in a list
+class ExcludedDayIndexView(ListView):
+    template_name = 'sadmin/excludedday/index.html'
+    context_object_name = 'ExcludedDay_list'
+
+    def get_queryset(self):
+        return ExcludedDay.objects.all()
+
+# Detail view (view ExcludedDay detail)
+class ExcludedDayDetailView(DetailView):
+    model = ExcludedDay
+    template_name = 'sadmin/excludedday/excludedday-detail.html'
+
+# New ExcludedDay view (Create new ExcludedDay)
+def ExcludedDayView(request):
+    if request.method == 'POST':
+        form = ExcludedDayForm(request.POST)
+        if form.is_valid():
+            form.save()
+        return redirect('excludedday')
+    form = ExcludedDayForm()
+    return render(request, 'sadmin/excludedday/excludedday.html', {'form': form})
+
+# Edit a ExcludedDay
+def EditExcludedDay(request, pk, template_name='sadmin/excludedday/edit.html'):
+    excludedday = get_object_or_404(ExcludedDay, pk=pk)
+    form = ExcludedDayForm(request.POST or None, instance=excludedday)
+    if form.is_valid():
+        form.save()
+        return redirect('excludedday')
+    return render(request, template_name, {'form': form})
+
+# Delete ExcludedDay
+def DeleteExcludedDay(request, pk, template_name='sadmin/excludedday/confirm_delete.html'):
+    excludedday = get_object_or_404(ExcludedDay, pk=pk)
+    if request.method == 'POST':
+        excludedday.delete()
+        return redirect('excludedday')
+    return render(request, template_name, {'object': excludedday})
+
 #Editing Member record - Special function
 def EditMemberRecordView(request,mr_num , template_name='sadmin/mrecord/edit.html'):
     memberrecord = get_object_or_404(MemberRecord, pk=mr_num)
@@ -228,7 +281,7 @@ def CurrencyView(request):
             form.save()
         return redirect('currency')
     form = CurrencyForm()
-    return render(request, 'sadmin/currency/termparameter.html', {'form': form})
+    return render(request, 'sadmin/currency/currency.html', {'form': form})
 
 # Edit a Currency
 def EditCurrency(request, pk, template_name='sadmin/currency/edit.html'):
@@ -253,7 +306,7 @@ class LevelIndexView(ListView):
     context_object_name = 'Level_list'
 
     def get_queryset(self):
-        return Level.objects.filter(lv_sb_code=self.kwargs['pk'])
+        return Level.objects.filter(lv_sl_code=self.kwargs['pk'])
 
 class LevelListView(ListView):
     template_name = 'sadmin/level/index1.html'
@@ -394,9 +447,74 @@ def DeleteFacility(request, pk, template_name='sadmin/facility/confirm_delete.ht
         return redirect('facility')
     return render(request, template_name, {'object': facility})
 
+# home view for SchoolLevel. SchoolLevel are displayed in a list
+class SchoolLevelIndexView(ListView):
+    template_name = 'sadmin/schoolLevel/index.html'
+    context_object_name = 'SchoolLevel_list'
+
+    def get_queryset(self):
+        return SchoolLevel.objects.all()
+
+class SchoolLevelIndexBillView(ListView):
+    template_name = 'sadmin/schoollevel/index_bill.html'
+    context_object_name = 'SchoolLevel_list'
+
+    def get_queryset(self):
+        return SchoolLevel.objects.all()
+class SchoolLevelIndex_rView(ListView):
+    template_name = 'sadmin/schoolLevel/index_r.html'
+    context_object_name = 'SchoolLevel_list'
+
+    def get_queryset(self):
+        return SchoolLevel.objects.all()
+# Detail view (view SchoolLevel detail)
+class SchoolLevelDetailView(DetailView):
+    model = SchoolLevel
+    template_name = 'sadmin/schoolLevel/schoolLevel-detail.html'
+
+# New SchoolLevel view (Create new SchoolLevel)
+def SchoolLevelView(request):
+    if request.method == 'POST':
+        form = SchoolLevelForm(request.POST)
+        if form.is_valid():
+            l_sl_code = form.cleaned_data['sl_code']
+            l_sl_name = form.cleaned_data['sl_name']
+            form.save()
+            subject = Subject.objects.all()
+
+            for sub in subject:
+                c_level = Level()
+
+                c_level.lv_sb_code_id = sub.sb_code
+                c_level.lv_name       = l_sl_name
+                c_level.lv_sl_code_id = l_sl_code
+
+                c_level.save()
+
+        return redirect('slevel')
+    form = SchoolLevelForm()
+    return render(request, 'sadmin/schoollevel/SchoolLevel.html', {'form': form})
+
+# Edit a SchoolLevel
+def EditSchoolLevel(request, pk, template_name='sadmin/schoollevel/edit.html'):
+    schoollevel = get_object_or_404(SchoolLevel, pk=pk)
+    form = SchoolLevelForm(request.POST or None, instance=schoollevel)
+    if form.is_valid():
+        form.save()
+        return redirect('slevel')
+    return render(request, template_name, {'form': form})
+
+# Delete SchoolLevel
+def DeleteSchoolLevel(request, pk, template_name='sadmin/schoollevel/confirm_delete.html'):
+    schoollevel = get_object_or_404(SchoolLevel, pk=pk)
+    if request.method == 'POST':
+        schoollevel.delete()
+        return redirect('sLevel')
+    return render(request, template_name, {'object': schoollevel})
+
 # home view for Dept. Dept are displayed in a list
 class DeptIndexView(ListView):
-    template_name = 'sadmin/Dept/index.html'
+    template_name = 'sadmin/dept/index.html'
     context_object_name = 'Dept_list'
 
     def get_queryset(self):
@@ -405,7 +523,7 @@ class DeptIndexView(ListView):
 # Detail view (view Dept detail)
 class DeptDetailView(DetailView):
     model = Dept
-    template_name = 'sadmin/Dept/Dept-detail.html'
+    template_name = 'sadmin/dept/dept-detail.html'
 
 # New Dept view (Create new Dept)
 def DeptView(request):
@@ -415,10 +533,10 @@ def DeptView(request):
             form.save()
         return redirect('dept')
     form = DeptForm()
-    return render(request, 'sadmin/Dept/Dept.html', {'form': form})
+    return render(request, 'sadmin/dept/dept.html', {'form': form})
 
 # Edit a Dept
-def EditDept(request, pk, template_name='sadmin/Dept/edit.html'):
+def EditDept(request, pk, template_name='sadmin/dept/edit.html'):
     dept = get_object_or_404(Dept, pk=pk)
     form = DeptForm(request.POST or None, instance=dept)
     if form.is_valid():
@@ -427,7 +545,7 @@ def EditDept(request, pk, template_name='sadmin/Dept/edit.html'):
     return render(request, template_name, {'form': form})
 
 # Delete Dept
-def DeleteDept(request, pk, template_name='sadmin/Dept/confirm_delete.html'):
+def DeleteDept(request, pk, template_name='sadmin/dept/confirm_delete.html'):
     dept = get_object_or_404(Dept, pk=pk)
     if request.method == 'POST':
         dept.delete()
@@ -440,7 +558,7 @@ class SchoolClassIndexView(ListView):
     context_object_name = 'SchoolClass_list'
 
     def get_queryset(self):
-        return SchoolClass.objects.filter(sc_lv_code=self.kwargs['pk'])
+        return SchoolClass.objects.filter(sc_sl_code=self.kwargs['pk'])
 
 class SchoolClassRegIndexView(ListView):
     template_name = 'sadmin/schoolclass/indexreg.html'
@@ -471,8 +589,10 @@ def SchoolClassView1(request):
     form = SchoolClassForm()
     return render(request, 'sadmin/schoolclass/schoolclass.html', {'form': form})
 
+
 def SchoolClassView(request, pk):
-    level = Level.objects.get(pk=pk)
+    # level = Level.objects.get(pk=pk)
+    schoollevel = SchoolLevel.objects.get(pk=pk)
 
     new_schoolclass = None
     if request.method == 'POST':
@@ -482,11 +602,31 @@ def SchoolClassView(request, pk):
         if form.is_valid():
             # Create a SchoolClass object but don't save to database yet
             new_schoolclass = form.save(commit=False)
-            new_schoolclass.sc_lv_code = level
+            new_schoolclass.sc_sl_code = schoollevel
 
             new_schoolclass.save()
+
+            new_sclass = SchoolClass.objects.get(pk=new_schoolclass.pk)
+
+            subject = Subject.objects.all()
+
+            for sub in subject:
+                c_subject = ClassSubject()
+
+                c_subject.cs_sb_code_id = sub.sb_code
+                c_subject.cs_name = sub.sb_desc
+                c_subject.cs_sl_code_id = schoollevel.sl_code
+
+                c_subject.cs_lv_code_id = new_sclass.sc_lv_code
+                c_subject.cs_sf_num_id = new_sclass.sc_sf_num_id
+                c_subject.cs_sc_code_id = new_sclass.sc_code
+
+                c_subject.save()
+
+                #print(sub.sb_code, sub.sb_desc ,schoollevel.sl_code ,new_sclass.sc_code)
+
             messages.success(request, "SchoolClass created successfully")
-        return redirect('schoolclass',pk)
+        return redirect('schoolclass', pk)
     else:
         form = SchoolClassForm()
     return render(request, 'sadmin/schoolclass/schoolclass.html', {'form': form})
@@ -507,6 +647,57 @@ def DeleteSchoolClass(request, pk, template_name='sadmin/schoolclass/confirm_del
         schoolclass.delete()
         return redirect('schoolclass')
     return render(request, template_name, {'object': schoolclass})
+
+# home view for Class Staff Member. Staff Member  are displayed in a list
+class ClassSubjectIndexView(ListView):
+    template_name = 'sadmin/classsubject/index.html'
+    context_object_name = 'ClassSubject_list'
+
+    def get_queryset(self):
+        return ClassSubject.objects.filter(cs_sc_code=self.kwargs['sc_code'])
+
+# Detail view (view ClassSubject detail)
+class ClassSubjectDetailView(DetailView):
+    model = ClassSubject
+    template_name = 'sadmin/classsubject/classsubject-detail.html'
+
+# New ClassSubject view (Create new ClassSubject)
+def ClassSubjectView(request, pk):
+    schoolclass = SchoolClass.objects.get(pk=pk)
+
+    new_classsubject = None
+    if request.method == 'POST':
+
+        form = ClassSubjectForm(data=request.POST or None)
+
+        if form.is_valid():
+            # Create a ClassSubject object but don't save to database yet
+            new_classsubject = form.save(commit=False)
+            new_classsubject.cs_sc_code = schoolclass
+
+            new_classsubject.save()
+            messages.success(request, "Class Subject created successfully")
+        return redirect('dept')
+    else:
+        form = ClassSubjectForm()
+    return render(request, 'sadmin/classsubject/classsubject.html', {'form': form})
+
+# Edit a Staff Member
+def EditClassSubject(request, pk, template_name='sadmin/classsubject/edit.html'):
+    classsubject = get_object_or_404(ClassSubject, pk=pk)
+    form = ClassSubjectForm(request.POST or None, instance=classsubject)
+    if form.is_valid():
+        form.save()
+        return redirect('classsubject',pk)
+    return render(request, template_name, {'form': form})
+
+# Delete Staff Member
+def DeleteClassSubject(request, pk, template_name='sadmin/classsubject/confirm_delete.html'):
+    classsubject = get_object_or_404(ClassSubject, pk=pk)
+    if request.method == 'POST':
+        classsubject.delete()
+        return redirect('classsubject',pk)
+    return render(request, template_name, {'object': classsubject})
 
 # home view for LevelClass. LevelClass are displayed in a list
 class LevelClassIndexView(ListView):
@@ -637,9 +828,60 @@ def EditMemberRegister(request, pk, template_name='sadmin/memberregister/edit.ht
     return render(request, template_name, {'form': form})
 
 # Edit a MemberRegister
-def EditMemberRegister1(request, mr_num, template_name='sadmin/memberregister/edit1.html'):
+def EditMemberRegister1(request, mr_num , template_name='sadmin/memberregister/edit1.html'):
     memberregister = get_object_or_404(MemberRegister, pk=mr_num)
-    form = MemberRegisterForm(request.POST or None, instance=memberregister)
+    if g_sb_num == 1:
+       form = MemberRegister1Form(request.POST or None, instance=memberregister)
+    elif g_sb_num == 2:
+       form = MemberRegister2Form(request.POST or None, instance=memberregister)
+    elif g_sb_num == 3:
+       form = MemberRegister3Form(request.POST or None, instance=memberregister)
+    elif g_sb_num == 4:
+       form = MemberRegister4Form(request.POST or None, instance=memberregister)
+    elif g_sb_num == 5:
+       form = MemberRegister5Form(request.POST or None, instance=memberregister)
+    elif g_sb_num == 6:
+       form = MemberRegister6Form(request.POST or None, instance=memberregister)
+    elif g_sb_num == 7:
+       form = MemberRegister7Form(request.POST or None, instance=memberregister)
+    elif g_sb_num == 8:
+       form = MemberRegister8Form(request.POST or None, instance=memberregister)
+    elif g_sb_num == 9:
+       form = MemberRegister9Form(request.POST or None, instance=memberregister)
+    elif g_sb_num == 10:
+       form = MemberRegister10Form(request.POST or None, instance=memberregister)
+    else:
+       form = MemberRegisterForm(request.POST or None, instance=memberregister)
+
+    if form.is_valid():
+        form.save()
+        return redirect('attendsched')
+    return render(request, template_name, {'form': form})
+def EditMemberRegister1(request, mr_num , template_name='sadmin/memberregister/edit1.html'):
+    memberregister = get_object_or_404(MemberRegister, pk=mr_num)
+    if g_sb_num == 1:
+       form = MemberRegister1Form(request.POST or None, instance=memberregister)
+    elif g_sb_num == 2:
+       form = MemberRegister2Form(request.POST or None, instance=memberregister)
+    elif g_sb_num == 3:
+       form = MemberRegister3Form(request.POST or None, instance=memberregister)
+    elif g_sb_num == 4:
+       form = MemberRegister4Form(request.POST or None, instance=memberregister)
+    elif g_sb_num == 5:
+       form = MemberRegister5Form(request.POST or None, instance=memberregister)
+    elif g_sb_num == 6:
+       form = MemberRegister6Form(request.POST or None, instance=memberregister)
+    elif g_sb_num == 7:
+       form = MemberRegister7Form(request.POST or None, instance=memberregister)
+    elif g_sb_num == 8:
+       form = MemberRegister8Form(request.POST or None, instance=memberregister)
+    elif g_sb_num == 9:
+       form = MemberRegister9Form(request.POST or None, instance=memberregister)
+    elif g_sb_num == 10:
+       form = MemberRegister10Form(request.POST or None, instance=memberregister)
+    else:
+       form = MemberRegisterForm(request.POST or None, instance=memberregister)
+
     if form.is_valid():
         form.save()
         return redirect('attendsched')
@@ -655,7 +897,7 @@ def DeleteMemberRegister(request, pk, template_name='sadmin/memberregister/confi
 
 # home view for Class Member. ClassMember  are displayed in a list
 class ClassMemberIndexView(ListView):
-    template_name = 'sadmin/ClassMember/index.html'
+    template_name = 'sadmin/classmember/index.html'
     context_object_name = 'ClassMember_list'
 
     def get_queryset(self):
@@ -664,7 +906,7 @@ class ClassMemberIndexView(ListView):
 # Detail view (view ClassMember detail)
 class ClassMemberDetailView(DetailView):
     model = ClassMember
-    template_name = 'sadmin/ClassMember/ClassMember-detail.html'
+    template_name = 'sadmin/classmember/classmember-detail.html'
 
 # New ClassMember view (Create new ClassMember)
 def ClassMemberView1(request):
@@ -674,7 +916,7 @@ def ClassMemberView1(request):
             form.save()
         return redirect('classmember')
     form = ClassMemberForm()
-    return render(request, 'sadmin/ClassMember/ClassMember.html', {'form': form})
+    return render(request, 'sadmin/classmember/authrelation.html', {'form': form})
 
 def ClassMemberView(request, pk):
     schoolclass = SchoolClass.objects.get(pk=pk)
@@ -695,10 +937,30 @@ def ClassMemberView(request, pk):
         return redirect('schoolclass',pk)
     else:
         form = ClassMemberForm()
-    return render(request, 'sadmin/ClassMember/ClassMember.html', {'form': form})
+    return render(request, 'sadmin/classmember/authrelation.html', {'form': form})
+def CreateStudentView(request, pk):
+    schoolclass = SchoolClass.objects.get(pk=pk)
+
+    new_classmember = None
+    if request.method == 'POST':
+
+        form = ClassMemberForm(data=request.POST or None)
+
+        if form.is_valid():
+            # Create a ClassMember object but don't save to database yet
+            new_classmember = form.save(commit=False)
+            new_classmember.cm_sc_code = schoolclass
+            new_classmember.cm_lv_code = schoolclass.sc_lv_code
+
+            new_classmember.save()
+            messages.success(request, "ClassMember created successfully")
+        return redirect('classlist')
+    else:
+        form = ClassMemberForm()
+    return render(request, 'sadmin/classmember/authrelation.html', {'form': form})
 
 # Edit a ClassMember
-def EditClassMember(request, pk, template_name='sadmin/ClassMember/edit.html'):
+def EditClassMember(request, pk, template_name='sadmin/classmember/edit.html'):
     classmember = get_object_or_404(ClassMember, pk=pk)
     form = ClassMemberForm(request.POST or None, instance=classmember)
     if form.is_valid():
@@ -706,7 +968,17 @@ def EditClassMember(request, pk, template_name='sadmin/ClassMember/edit.html'):
         return redirect('classmember',pk)
     return render(request, template_name, {'form': form})
 
-def EditClassMember1(request, mr_cm_num, template_name='sadmin/ClassMember/edit.html'):
+def EditStudent(request, cm_num, template_name='sadmin/classmember/edit.html'):
+    classmember = get_object_or_404(ClassMember, cm_num=cm_num)
+    form = ClassMemberForm(request.POST or None, instance=classmember)
+    sc_code = classmember.cm_sc_code
+
+    if form.is_valid():
+        form.save()
+        return redirect('students',sc_code)
+    return render(request, template_name, {'form': form})
+
+def EditClassMember1(request, mr_cm_num, template_name='sadmin/classmember/edit.html'):
     classmember = get_object_or_404(ClassMember, pk=mr_cm_num)
     form = ClassMemberForm(request.POST or None, instance=classmember)
     if form.is_valid():
@@ -1030,7 +1302,7 @@ def ClassAssessmentView1(request):
             form.save()
         return redirect('classassessment')
     form = ClassAssessmentForm()
-    return render(request, 'sadmin/classassessment/SubjectBilling.html', {'form': form})
+    return render(request, 'sadmin/classassessment/subjectbilling.html', {'form': form})
 
 def ClassAssessmentView(request, pk):
     scheme = Schemes.objects.get(pk=pk)
@@ -1046,7 +1318,7 @@ def ClassAssessmentView(request, pk):
             # Create a ClassAssessment object but don't save to database yet
             new_classassessment = form.save(commit=False)
             new_classassessment.as_ch_num = scheme
-            new_classassessment.as_lc_num = scheme.ch_lc_num
+            #new_classassessment.as_lc_num = scheme.ch_lc_num
             new_classassessment.as_sc_code = scheme.ch_sc_code
             new_classassessment.as_sb_code = scheme.ch_sb_code
 
@@ -1112,7 +1384,7 @@ def LearnerAssessmentView(request, pk):
             new_learnerassessment = form.save(commit=False)
             new_learnerassessment.la_as_num = classassessment
             new_learnerassessment.la_sc_code = classassessment.as_sc_code
-            new_learnerassessment.la_lc_num = classassessment.as_lc_num
+            #new_learnerassessment.la_lc_num = classassessment.as_lc_num
             #new_learnerassessment.la_cm_num = classassessment.as_cm_num
             new_learnerassessment.la_sb_code = classassessment.as_sb_code
 
@@ -1340,7 +1612,7 @@ def SpaceSlotView1(request):
             form.save()
         return redirect('spaceslot')
     form = SpaceSlotForm()
-    return render(request, 'sadmin/spaceslot/spaceslot.html', {'form': form})
+    return render(request, 'sadmin/spaceslot/slotlist.html', {'form': form})
 
 def SpaceSlotView(request, pk):
     facilityspace = FacilitySpace.objects.get(pk=pk)
@@ -1360,7 +1632,7 @@ def SpaceSlotView(request, pk):
         return redirect('facilityspace',pk)
     else:
         form = SpaceSlotForm()
-    return render(request, 'sadmin/spaceslot/spaceslot.html', {'form': form})
+    return render(request, 'sadmin/spaceslot/slotlist.html', {'form': form})
 
 # Edit a Space Slot
 def EditSpaceSlot(request, pk, template_name='sadmin/spaceslot/edit.html'):
@@ -1386,10 +1658,11 @@ class ClassBillingIndexView(ListView):
     context_object_name = 'ClassBilling_list'
 
     def get_queryset(self):
-        return ClassBilling.objects.filter(cb_sc_code =self.kwargs['pk'])
+        return ClassBilling.objects.filter(cb_sl_code =self.kwargs['pk'])
 
 def ClassBillingView(request, pk):
-        schoolclass = SchoolClass.objects.get(pk=pk)
+        schoollevel = SchoolLevel.objects.get(pk=pk)
+        schoolclass = SchoolClass.objects.get(sc_sl_code=pk)
         termparams = TermParameter.objects.get(tp_billed='N')
 
         new_classbilling = None
@@ -1401,14 +1674,14 @@ def ClassBillingView(request, pk):
                 # Create a Class Billing Instance object but don't save to database yet
                 new_classbilling = form.save(commit=False)
 
+                new_classbilling.cb_sl_code = schoollevel
                 new_classbilling.cb_sc_code = schoolclass
-                new_classbilling.cb_lv_code = schoolclass.sc_lv_code
                 new_classbilling.cb_year = termparams.tp_year
                 new_classbilling.cb_term = termparams.tp_term
 
                 new_classbilling.save()
                 messages.success(request, "Billing head object created successfully")
-            return redirect('ratesschoolclass')
+            return redirect('schlevelrates')
         else:
             form = ClassBillingForm()
         return render(request, 'sadmin/billing/classbilling.html', {'form': form})
@@ -1418,10 +1691,10 @@ class SubjectBillingIndexView(ListView):
     context_object_name = 'SubjectBilling_list'
 
     def get_queryset(self):
-        return SubjectBilling.objects.filter(jb_lc_num=self.kwargs['pk'])
+        return SubjectBilling.objects.filter(jb_sc_code=self.kwargs['pk'])
 
 def SubjectBillingView(request, pk):
-    levelclass = LevelClass.objects.get(pk=pk)
+    schoolclass = SchoolClass.objects.get(pk=pk)
     termparams = TermParameter.objects.get(tp_billed='N')
 
     new_subjectbilling = None
@@ -1433,10 +1706,9 @@ def SubjectBillingView(request, pk):
             # Create a Subject Billing Instance object but don't save to database yet
             new_subjectbilling = form.save(commit=False)
 
-            new_subjectbilling.jb_lc_num = levelclass
-            new_subjectbilling.jb_sc_code = levelclass.lc_sc_code
-            new_subjectbilling.jb_lv_code = levelclass.lc_lv_code
-            new_subjectbilling.jb_sb_code = levelclass.lc_sb_code
+            new_subjectbilling.jb_sc_code = schoolclass
+            new_subjectbilling.jb_sl_code = schoolclass.sc_sl_code
+            new_subjectbilling.jb_lv_code = schoolclass.sc_lv_code
             new_subjectbilling.jb_year = termparams.tp_year
             new_subjectbilling.jb_term = termparams.tp_term
 
@@ -1446,6 +1718,116 @@ def SubjectBillingView(request, pk):
     else:
         form = SubjectBillingForm()
     return render(request, 'sadmin/billing/subjectbilling.html', {'form': form})
+
+# home view for MemberMovement. MemberMovement are displayed in a list
+class MemberMovementIndexView(ListView):
+    template_name = 'sadmin/membermovement/index.html'
+    context_object_name = 'MemberMovement_list'
+
+    def get_queryset(self):
+        return MemberMovement.objects.filter(mm_cm_num=self.kwargs['pk'])
+
+ # Detail view (view MemberMovement detail)
+class MemberMovementDetailView(DetailView):
+    model = MemberMovement
+    template_name = 'sadmin/membermovement/membermovement.detail.html'
+
+def MemberMovementView(request, pk):
+    classmember = ClassMember.objects.get(pk=pk)
+
+    new_membermovement = None
+    if request.method == 'POST':
+
+        form = MemberMovementForm(data=request.POST or None)
+
+        if form.is_valid():
+            # Create a MemberMovement object but don't save to database yet
+            new_membermovement = form.save(commit=False)
+            new_membermovement.mm_cm_num  = classmember
+            new_membermovement.mm_sc_code = classmember.cm_sc_code
+
+            new_membermovement.save()
+
+            messages.success(request, "Member Movement created successfully")
+        return redirect('classmember',pk)
+    else:
+        form = MemberMovementForm()
+    return render(request, 'sadmin/membermovement/membermovement.html', {'form': form})
+
+# Edit a MemberMovement
+def EditMemberMovement(request, pk, template_name='sadmin/membermovement/edit.html'):
+    membermovement = get_object_or_404(MemberMovement, pk=pk)
+    form = MemberMovementForm(request.POST or None, instance=membermovement)
+    if form.is_valid():
+        form.save()
+        return redirect('membermovement',pk)
+    return render(request, template_name, {'form': form})
+
+# Delete MemberMovement
+def DeleteMemberMovement(request, pk, template_name='sadmin/membermovement/confirm_delete.html'):
+    membermovement = get_object_or_404(MemberMovement, pk=pk)
+    if request.method == 'POST':
+        membermovement.delete()
+        return redirect('membermovement')
+    return render(request, template_name, {'object': membermovement})
+
+# home view for AuthRelation. AuthRelation are displayed in a list
+class AuthRelationIndexView(ListView):
+    template_name = 'sadmin/authrelation/index.html'
+    context_object_name = 'AuthRelation_list'
+
+    def get_queryset(self):
+        return AuthRelation.objects.filter(ar_cm_num=self.kwargs['pk'])
+
+ # Detail view (view AuthRelation detail)
+class AuthRelationDetailView(DetailView):
+    model = AuthRelation
+    template_name = 'sadmin/authrelation/authrelation.detail.html'
+
+ # New Authorized relation object
+
+def AuthRelationView(request, cm_num):
+    classmember = ClassMember.objects.get(cm_num=cm_num)
+    #l_sc_code = 0
+
+    new_authrelation = None
+    if request.method == 'POST':
+
+        form = AuthRelationForm(data=request.POST or None)
+
+        if form.is_valid():
+            # Create a AuthRelation object but don't save to database yet
+            new_authrelation = form.save(commit=False)
+            new_authrelation.ar_cm_num  = classmember
+            new_authrelation.ar_sc_code = classmember.cm_sc_code
+            l_cm_num = classmember.cm_num
+            l_sc_code = classmember.cm_sc_code
+            print(l_cm_num,l_sc_code)
+
+            new_authrelation.save()
+
+            messages.success(request, "Authorized relation created successfully")
+        return redirect('students',cm_num)
+    else:
+        form = AuthRelationForm()
+    return render(request, 'sadmin/authrelation/authrelation.html', {'form': form})
+
+# Edit a AuthRelation
+def EditAuthRelation(request, pk, template_name='sadmin/authrelation/edit.html'):
+    authrelation = get_object_or_404(AuthRelation, pk=pk)
+    form = AuthRelationForm(request.POST or None, instance=authrelation)
+    if form.is_valid():
+        form.save()
+        return redirect('authrelation',pk)
+    return render(request, template_name, {'form': form})
+
+# Delete AuthRelation
+def DeleteAuthRelation(request, pk, template_name='sadmin/authrelation/confirm_delete.html'):
+    authrelation = get_object_or_404(AuthRelation, pk=pk)
+    if request.method == 'POST':
+        authrelation.delete()
+        return redirect('authrelation')
+    return render(request, template_name, {'object': authrelation})
 
 def ClassListView(request):
 
@@ -1461,7 +1843,7 @@ def ClassListView(request):
 
 def SchemesListView(request):
 
-    dataset = Schemes.objects.values('ch_num','ch_lc_num__lc_desc','ch_sc_code__sc_desc','ch_sf_num__sf_surname',
+    dataset = Schemes.objects.values('ch_num','ch_sc_code','ch_lc_num__lc_desc','ch_sc_code__sc_desc','ch_sf_num__sf_surname',
               'ch_sb_code__sb_desc','ch_eff_date','ch_week','ch_topic',
               'ch_objectives','ch_methods','ch_evaluation','ch_status').annotate(num_of=Count('ch_num')).order_by('ch_sc_code__sc_desc','ch_week')
 
@@ -1472,9 +1854,9 @@ def SchemesListView(request):
 
     return render(request, 'sadmin/reports/schemes_list.html', context)
 
-def DailyPlanListView(request,sc_code):
+def DailyPlanListView(request,ch_num):
 
-    dataset = DailyPlan.objects.filter(sp_sc_code=sc_code).values('sp_num','sp_plan_date','sp_del_date','sp_day',\
+    dataset = DailyPlan.objects.filter(sp_ch_num=ch_num).values('sp_num','sp_plan_date','sp_del_date','sp_day',\
 		'sp_start_time','sp_finish_time','sp_cycle','sp_sc_code__sc_desc','sp_sb_code__sb_desc','sp_hrs','sp_area',\
         'sp_absorption').order_by('sp_del_date')
 
@@ -1485,6 +1867,18 @@ def DailyPlanListView(request,sc_code):
 
     return render(request, 'sadmin/reports/dailyplan_list.html', context)
 
+def ClassDailyPlanListView(request,sc_code):
+
+    dataset = DailyPlan.objects.filter(sp_sc_code=sc_code).values('sp_num','sp_plan_date','sp_del_date','sp_day',\
+		'sp_start_time','sp_finish_time','sp_cycle','sp_sc_code__sc_desc','sp_sb_code__sb_desc','sp_hrs','sp_area',\
+        'sp_absorption','sp_sc_code').order_by('sp_del_date')
+
+    dailyplan = DailyPlanFilter(request.GET, queryset=dataset)
+    #total_num = sc_class.qs.aggregate(TotNum=Sum('num_of'))
+
+    context = {'filter': dailyplan}
+
+    return render(request, 'sadmin/reports/dailyplan_list.html', context)
 def ClassAssessmentListView(request,sc_code):
 
     dataset = ClassAssessment.objects.filter(as_sc_code=sc_code).values('as_num','as_lc_num__lc_desc',\
@@ -1518,9 +1912,9 @@ def LearnerAssessmentListView(request,as_num):
 
     return render(request, 'sadmin/reports/learnerassessment_list.html', context)
 
-def MemberRegisterListView(request,sc_code):
+def MemberRegisterListView(request,sc_code,sp_del_date):
 
-    dataset = MemberRegister.objects.filter(mr_sc_code=sc_code).values('mr_cm_num','mr_num','mr_year','mr_term','mr_cm_num__cm_surname',\
+    dataset = MemberRegister.objects.filter(mr_sc_code=sc_code,mr_date=sp_del_date).values('mr_cm_num','mr_num','mr_year','mr_term','mr_cm_num__cm_surname',\
             'mr_cm_num__cm_fname','mr_sc_code__sc_desc','mr_comment','mr_date','mr_day','mr_mark',
             'mr_status').annotate(present=Count('mr_num',filter=Q(mr_mark='P')),sick=Count('mr_num',filter=Q(mr_mark='S')),\
             absent=Count('mr_num',filter=Q(mr_mark='A')),total_num=Count('mr_num')).order_by('mr_date','mr_cm_num')
@@ -1535,6 +1929,7 @@ def MemberRegisterListView(request,sc_code):
                'tot_excused': tot_sick,'tot_absent': tot_absent}
     return render(request, 'sadmin/reports/memberregister_list.html', context)
 
+
 class GenSchemeView(View):
     form_class = GenSchemeForm
     template_name = 'sadmin/reports/genscheme.html'
@@ -1548,110 +1943,113 @@ class GenSchemeView(View):
         form = self.form_class(request.POST)
         context = {'form': form}
         if form.is_valid():
-            l_year =  form.cleaned_data['f_year']
+            l_year = form.cleaned_data['f_year']
             l_term = form.cleaned_data['f_term']
-            l_gen  = form.cleaned_data['Gen_ok']
+            l_gen = form.cleaned_data['Gen_ok']
 
-            termparams = TermParameter.objects.get(tp_year=l_year,tp_term=l_term)
+            termparams = TermParameter.objects.get(tp_year=l_year, tp_term=l_term)
 
-            l_tp_year       = termparams.tp_year
-            l_tp_term       = termparams.tp_term
-            l_tp_weeks      = termparams.tp_weeks
+            l_tp_year = termparams.tp_year
+            l_tp_term = termparams.tp_term
+            l_tp_weeks = termparams.tp_weeks
             l_tp_period_len = termparams.tp_period_len
-            l_cycle_days    = termparams.tp_cycledays
-            l_tp_days       = termparams.tp_days
+            l_cycle_days = termparams.tp_cycledays
+            l_tp_days = termparams.tp_days
             l_tp_start_date = termparams.tp_start_date
-            l_tp_end_date   = termparams.tp_end_date
-            l_tp_status     = termparams.tp_status
-            l_tp_schemed    = termparams.tp_schemed
+            l_tp_end_date = termparams.tp_end_date
+            l_tp_status = termparams.tp_status
+            l_tp_schemed = termparams.tp_schemed
+            l_tp_period_len = termparams.tp_period_len
 
             l_sp_start_date = l_tp_start_date
+            l_eff_date = l_tp_start_date
 
-    #Loop through Level Class Subject (For each study level, class and subject )
+            # Loop through Level Class Subject (For each study level, class and subject )
             if l_gen == 'Y' and l_tp_schemed == '1':
-              levelclass = LevelClass.objects.all()
-              #levelclass1 = LevelClass.objects.get(pk=pk)
 
-              for level in levelclass :
-                 levelclass1 = LevelClass.objects.get(pk=level.lc_num)
+                classsubject = ClassSubject.objects.filter(cs_status='1')  # all()
 
-                 syllabus   = Syllabus.objects.get(sy_sb_code=levelclass1.lc_sb_code)
+                for subject in classsubject:
+                    classsubject1 = ClassSubject.objects.get(pk=subject.cs_code)
 
-                 l_sy_code  = syllabus
-                 l_ex_board = syllabus.sb_ex_board
+                    # syllabus   = Syllabus.objects.get(sy_sb_code=levelclass1.lc_sb_code)
 
-                 l_week      = 1
-                 no_of_weeks = 1
-                 l_status    = 0
+                    # l_sy_code  = syllabus
+                    # l_ex_board = syllabus.sb_ex_board
 
-                 while l_week <= l_tp_weeks :
-                    c_scheme = Schemes()
+                    l_week = 1
+                    no_of_weeks = 1
+                    l_status = 0
 
-                    c_scheme.ch_lc_num   = levelclass1
-                    c_scheme.ch_sc_code  = levelclass1.lc_sc_code
-                    c_scheme.ch_sf_num   = levelclass1.lc_sf_num
-                    c_scheme.ch_lv_code  = levelclass1.lc_lv_code
-                    c_scheme.ch_sb_code  = levelclass1.lc_sb_code
-                    c_scheme.ch_year     = l_tp_year
-                    c_scheme.ch_term     = l_tp_term
-                    c_scheme.ch_sy_code  = l_sy_code
-                    c_scheme.ch_ex_board = l_ex_board
-                    c_scheme.ch_week     = l_week
-                    c_scheme.ch_status   = l_status
+                    while l_week <= l_tp_weeks:
+                        c_scheme = Schemes()
+                        # print(l_week)
+                        c_scheme.ch_cs_code  = classsubject1
+                        c_scheme.ch_sc_code  = classsubject1.cs_sc_code
+                        c_scheme.ch_sf_num   = classsubject1.cs_sf_num
+                        c_scheme.ch_sl_code  = classsubject1.cs_sl_code
+                        c_scheme.ch_sb_code  = classsubject1.cs_sb_code
+                        c_scheme.ch_eff_date = l_eff_date
+                        c_scheme.ch_year     = l_tp_year
+                        c_scheme.ch_term     = l_tp_term
+                        # c_scheme.ch_sy_code  = l_sy_code
+                        # c_scheme.ch_ex_board = l_ex_board
+                        c_scheme.ch_week = l_week
+                        c_scheme.ch_status = l_status
 
-                    c_scheme.save()
-                    l_day = 0
-                    l_day_num = 0
-                    l_weekendday = 'N'
-                    l_hrs =30
+                        c_scheme.save()
+                        l_day        = 0
+                        l_day_num    = 0
+                        l_weekendday = 'N'
+                        l_hrs        = l_tp_period_len
+                        l_eff_date   = l_eff_date + datetime.timedelta(days=l_cycle_days)
 
-                    print(l_cycle_days)
-                    while l_day <= 5: #l_cycle_days : l_tp_days:
-                        new_scheme = Schemes.objects.get(pk=c_scheme.pk)
+                        # print(l_cycle_days)
+                        while l_day    <= l_cycle_days:  # l_cycle_days : l_tp_days:
+                            new_scheme = Schemes.objects.get(pk=c_scheme.pk)
 
-                        #l_sp_ch_num = Schemes.objects.order_by('-pk')[0]
-                        #for sp_num in l_sp_ch_num:
-                         #   sp_pk = sp_num.pk
+                            c_dalypan  = DailyPlan()
 
-                        c_dalypan = DailyPlan()
+                            l_d_status = '0'
+                            week_end   = [5, 6]
 
-                        l_d_status = 'N'
-                        week_end = [5, 6]
+                            if l_sp_start_date.weekday() in week_end:
+                                l_d_status = 'W'
+                                l_day_num  = 0
+                            else:
+                                l_day      = (l_day + 1)
+                                l_day_num  = l_day
 
-                        if l_sp_start_date.weekday() in week_end:
-                            l_d_status = 'W'
-                            l_day_num = 0
-                        else:
-                            l_day = (l_day + 1)
-                            l_day_num = l_day
+                            if ExcludedDay.objects.filter(ex_date=l_sp_start_date,ex_status='1').exists():
+                                l_d_status = 'H'
+                                l_day_num  = 0
 
-                        #c_dalypan.sp_ch_num    = sp_pk #new_scheme
-                        c_dalypan.sp_ch_num_id    = new_scheme.ch_num
-                        c_dalypan.sp_lc_num       = new_scheme.ch_lc_num
-                        c_dalypan.sp_sc_code      = new_scheme.ch_sc_code
-                        c_dalypan.sp_sf_num       = new_scheme.ch_sf_num
-                        c_dalypan.sp_sb_code      = new_scheme.ch_sb_code
-                        c_dalypan.sp_year         = new_scheme.ch_year
-                        c_dalypan.sp_term         = new_scheme.ch_term
-                        c_dalypan.sp_cycle        = new_scheme.ch_week
-                        c_dalypan.sp_day          = l_day_num
-                        c_dalypan.sp_hrs          = l_hrs
-                        c_dalypan.sp_del_date     = l_sp_start_date
-                        c_dalypan.sp_plan_date    = l_sp_start_date
-                        c_dalypan.sp_type         = '1' #new_scheme.ch_type
-                        c_dalypan.sp_status       = l_d_status
+                            c_dalypan.sp_ch_num_id = new_scheme.ch_num
+                            c_dalypan.sp_cs_code   = new_scheme.ch_cs_code
+                            c_dalypan.sp_sl_code   = new_scheme.ch_sl_code
+                            c_dalypan.sp_sc_code   = new_scheme.ch_sc_code
+                            c_dalypan.sp_sf_num    = new_scheme.ch_sf_num
+                            c_dalypan.sp_sb_code   = new_scheme.ch_sb_code
+                            c_dalypan.sp_year      = new_scheme.ch_year
+                            c_dalypan.sp_term      = new_scheme.ch_term
+                            c_dalypan.sp_cycle     = new_scheme.ch_week
+                            c_dalypan.sp_day       = l_day_num
+                            c_dalypan.sp_hrs       = l_hrs
+                            c_dalypan.sp_del_date  = l_sp_start_date
+                            c_dalypan.sp_plan_date = l_sp_start_date
+                            c_dalypan.sp_type      = '1'  # new_scheme.ch_type
+                            c_dalypan.sp_status    = l_d_status
 
-                        c_dalypan.save()
+                            c_dalypan.save()
+                            l_d_status      = '0'
+                            l_sp_start_date = l_sp_start_date + datetime.timedelta(days=1)
 
-                        l_sp_start_date = l_sp_start_date + datetime.timedelta(days=1)
-
-                    l_week  = l_week + 1
-                    l_tp_start_date = l_tp_start_date + datetime.timedelta(days=1)
+                        l_week = l_week + 1
+                        l_tp_start_date = l_tp_start_date + datetime.timedelta(days=1)
 
             return redirect('genscheme')
 
         return render(request, self.template_name, {'GenSchemeForm': form})
-
 class GenRegisterView(View):
     form_class = GenRegiserForm
     template_name = 'sadmin/reports/genregister.html'
@@ -1693,6 +2091,19 @@ class GenRegisterView(View):
 
                  while l_days <= l_tp_days :
                     m_register = MemberRegister()
+                    l_d_status = 'N'
+                    week_end = [5, 6]
+
+                    if l_mr_date.weekday() in week_end:
+                        l_d_status = 'W'
+                        l_mr_mark = 'W'
+                    else:
+                        l_d_status = 'N'
+                        l_mr_mark = 'P'
+
+                    if ExcludedDay.objects.filter(ex_date=l_mr_date).exists():
+                        l_d_status = 'H'
+                        l_mr_mark = 'H'
 
                     m_register.mr_cm_num_id  = l_cm_num #levelclass1.cm_num
                     m_register.mr_sc_code = l_cm_sc_code #levelclass1.cm_sc_code
@@ -1700,14 +2111,121 @@ class GenRegisterView(View):
                     m_register.mr_year    = l_tp_year
                     m_register.mr_term    = l_tp_term
                     m_register.mr_day     = l_days
+                    m_register.mr_status  = l_d_status
+                    m_register.mr_mark    = l_mr_mark
+
                     m_register.save()
-                    l_days    = l_days + 1
-                    l_mr_date = l_mr_date + datetime.timedelta(days=1)
+                    l_days     = l_days + 1
+                    l_mr_date  = l_mr_date + datetime.timedelta(days=1)
+                    l_d_status = 'N'
+                    l_mr_mark  = 'P'
 
             return redirect('genregister')
 
         return render(request, self.template_name, {'GenRegiserForm': form})
 
+class GenSpaceLotView(View):
+    form_class = GenSpaceLotForm
+    template_name = 'sadmin/reports/genspacelot.html'
+
+    def get(self, request, *args, **kwargs):
+        form = self.form_class()
+        return render(request, self.template_name, {'GenSpaceLotForm': form})
+
+    def post(self, request, *args, **kwargs):
+
+        form = self.form_class(request.POST)
+        context = {'form': form}
+        if form.is_valid():
+            l_year = form.cleaned_data['f_year']
+            l_term = form.cleaned_data['f_term']
+            l_gen = form.cleaned_data['Gen_ok']
+
+            termparams = TermParameter.objects.get(tp_year=l_year, tp_term=l_term)
+
+            l_tp_year = termparams.tp_year
+            l_tp_term = termparams.tp_term
+            l_tp_weeks = termparams.tp_weeks
+            l_tp_period_len = termparams.tp_period_len
+            l_tp_days = termparams.tp_days
+            l_tp_start_date = termparams.tp_start_date
+            l_tp_end_date = termparams.tp_end_date
+            l_start_time = termparams.tp_start_time
+            l_finish_time = termparams.tp_end_time
+            l_tp_status = termparams.tp_status
+            l_tp_schemed = termparams.tp_schemed
+
+            # Loop through Level Class Subject (For each study level, class and subject )
+            if l_gen == 'Y':
+                facilityspace = FacilitySpace.objects.all()
+
+                for space in facilityspace:
+                    l_fs_num = space.fs_num
+                    l_fc_num = space.fs_fc_num_id
+
+                    l_mr_date = l_tp_start_date
+                    l_days = 1
+
+                    print(space.fs_num, space.fs_fc_num)
+                    while l_days <= l_tp_days:
+                        num_slots = 0
+                        max_slots = 28
+
+                        slot_start_time = l_start_time
+                        slot_finish_time = l_finish_time
+
+                        #spaceslot = SpaceSlot()
+                        l_d_status = 'N'
+                        week_end = [5, 6]
+
+                        if l_mr_date.weekday() in week_end:
+                            l_d_status = 'W'
+                            l_mr_mark = 'W'
+                        else:
+                            l_d_status = 'N'
+                            l_mr_mark = 'P'
+
+                        if ExcludedDay.objects.filter(ex_date=l_mr_date).exists():
+                            l_d_status = 'H'
+                            l_mr_mark = 'H'
+
+                        #num_slots = 0
+                        #max_slots = 28
+
+                        #slot_start_time = l_start_time
+                        #slot_finish_time = l_finish_time
+
+                        print(slot_start_time, l_finish_time)
+
+                        #while slot_start_time <= l_finish_time:
+                        while num_slots <= max_slots:
+                            spaceslot = SpaceSlot()
+                            slot_finish_time = (slot_start_time + datetime.timedelta(minutes=30))
+
+                            print(l_days, '****',slot_start_time,slot_finish_time)
+                            spaceslot.sp_fs_num_id = l_fs_num
+                            spaceslot.sp_fc_num_id = l_fc_num
+                            # spaceslot.sp_sc_code_id = l_fs_num
+
+                            spaceslot.sp_date = l_mr_date
+                            spaceslot.sp_day = l_days
+                            spaceslot.sp_start_time = slot_start_time
+                            spaceslot.sp_finish_time = slot_finish_time
+
+                            spaceslot.save()
+
+                            num_slots = (num_slots + 1)
+
+                            slot_start_time = slot_finish_time
+
+                        l_days = l_days + 1
+                        l_mr_date = l_mr_date + datetime.timedelta(days=1)
+                        l_d_status = 'N'
+                        l_mr_mark = 'P'
+
+            return redirect('genspacelot')
+
+        return render(request, self.template_name, {'GenSpaceLotForm': form})
 class GenBillView(View):
     form_class = GenBillForm
     template_name = 'sadmin/reports/genbill.html'
@@ -1739,12 +2257,6 @@ class GenBillView(View):
             # Loop through Level Class Subject (For each study level, class and subject )
             if l_gen == 'Y':
 
-                # schoolclass  = SchoolClass.objects.all().order_by('sc_code')
-
-                # for school in schoolclass :
-                #   l_sc_code = school.sc_code
-                #  l_lv_code = school.sc_lv_code
-
                 classmember = ClassMember.objects.all().order_by('cm_sc_code')
 
                 for member in classmember:
@@ -1752,11 +2264,11 @@ class GenBillView(View):
                     l_sc_code = member.cm_sc_code
                     l_lv_code = member.cm_lv_code
 
-                    classbilling = ClassBilling.objects.filter(cb_sc_code=l_sc_code, cb_lv_code=l_lv_code)
-
-                    levelclass = LevelClass.objects.filter(lc_sc_code=l_sc_code, lc_lv_code=l_lv_code)
+                    classbilling = ClassBilling.objects.filter(cb_sc_code=l_sc_code)
 
                     for billing in classbilling:
+
+                        #print(billing.cb_num,billing.cb_rate,billing.cb_year)
                         l_cb_num = billing.cb_num
                         l_cb_sc_code = billing.cb_sc_code
                         l_cb_lv_code = billing.cb_lv_code
@@ -1788,22 +2300,15 @@ class GenBillView(View):
 
                         membrec_c.save()
 
-                    for level in levelclass:
-                        l_lc_num = level.lc_num
-                        l_lc_sc_code = level.lc_sc_code
-                        l_lc_lv_code = level.lc_lv_code
-                        l_lc_sb_code = level.lc_sb_code
-
-                        subjectbilling = SubjectBilling.objects.filter(jb_sc_code=l_lc_sc_code,
-                                         jb_lv_code=l_lc_lv_code, jb_sb_code=l_lc_sb_code,
-                                         jb_lc_num=l_lc_num)
+                        subjectbilling = SubjectBilling.objects.filter(jb_sc_code=l_sc_code)
 
                         for subject in subjectbilling:
+
                             l_jb_num = subject.jb_num
-                            l_jb_lc_num = subject.jb_lc_num
+                            l_jb_sl_code = subject.jb_sl_code
                             l_jb_sc_code = subject.jb_sc_code
                             l_jb_lv_code = subject.jb_lv_code
-                            l_jb_sb_code = subject.jb_sb_code
+                            #l_jb_sb_code = subject.jb_sb_code
                             l_jb_type = subject.jb_type
                             l_jb_desc = subject.jb_desc
                             l_jb_rate = subject.jb_rate
@@ -1814,7 +2319,7 @@ class GenBillView(View):
                             membrec_sb = MemberRecord()
 
                             membrec_sb.mr_cm_num_id = l_cm_num
-                            membrec_sb.mr_sc_code = l_sc_code
+                            membrec_sb.mr_sc_code = l_jb_sc_code
                             membrec_sb.mr_lv_code = l_lv_code
                             membrec_sb.mr_jb_num_id = l_jb_num
                             membrec_sb.mr_year = l_jb_year
@@ -1833,9 +2338,10 @@ class GenBillView(View):
 
                             membrec_sb.save()
 
-            return redirect('genregister')
+            return redirect('billgen')
 
-        return render(request, self.template_name, {'GenRegiserForm': form})
+        return render(request, self.template_name, {'GenBillForm': form})
+
 class GenSeatsView(View):
     form_class = GenClassForm
     template_name = 'sadmin/reports/genclass.html'
@@ -1892,6 +2398,122 @@ class GenSeatsView(View):
 
             return redirect('genclasseats')
         return render(request, self.template_name, {'GenRegiserForm': form})
+class GenLevelView(View):
+    form_class = GenLevelForm
+    template_name = 'sadmin/reports/genslevel.html'
+
+    def get(self, request, *args, **kwargs):
+        form = self.form_class()
+        return render(request, self.template_name, {'GenLevelForm': form})
+
+    def post(self, request, *args, **kwargs):
+
+        form = self.form_class(request.POST)
+        context = {'form': form}
+        if form.is_valid():
+            l_lv_code =  form.cleaned_data['l_code']
+            l_gen     = form.cleaned_data['Gen_ok']
+
+    #Loop through Subjects assigning ot to a school class
+            if l_gen == 'Y':
+              subject = Subject.objects.all()
+              for sub in subject :
+
+                 schoollevel = SchoolLevel.objects.all()
+
+                 for school in schoollevel:
+                    level = Level()
+
+                    level.lv_code          = l_lv_code
+                    level.lv_name          = school.sl_name
+                    level.lv_sl_code_id    = school.sl_code
+                    level.lv_sb_code_id    = sub.sb_code
+
+                    level.save()
+                    print(l_lv_code, school.sl_name ,school.sl_code ,sub.sb_code)
+                    l_lv_code = (l_lv_code + 1)
+
+            return redirect('genlevel')
+
+        return render(request, self.template_name, {'GenLevelForm': form})
+
+class GenMovementView(View):
+    form_class = GenMovementForm
+    template_name = 'sadmin/reports/genmovement.html'
+
+    def get(self, request, *args, **kwargs):
+        form = self.form_class()
+        return render(request, self.template_name, {'GenMovementForm': form})
+
+    def post(self, request, *args, **kwargs):
+
+        form = self.form_class(request.POST)
+        context = {'form': form}
+        if form.is_valid():
+            l_class_code =  form.cleaned_data['class_code']
+            #l_term = form.cleaned_data['f_term']
+            l_gen  = form.cleaned_data['Gen_ok']
+
+            termparams = TermParameter.objects.get(tp_status='1')
+
+            l_tp_year       = termparams.tp_year
+            l_tp_term       = termparams.tp_term
+            l_tp_weeks      = termparams.tp_weeks
+            l_tp_period_len = termparams.tp_period_len
+            l_tp_days       = termparams.tp_days
+            l_tp_start_date = termparams.tp_start_date
+            l_tp_end_date   = termparams.tp_end_date
+            l_tp_status     = termparams.tp_status
+            l_tp_schemed    = termparams.tp_schemed
+
+    #Loop through Level Class Subject (For each study level, class and subject )
+            if l_gen == 'Y':
+              classmember = ClassMember.objects.filter(cm_sc_code=l_class_code) #all()
+
+              for member in classmember :
+                 l_cm_num     = member.cm_num
+                 l_cm_sc_code = member.cm_sc_code
+                 l_mr_date    = l_tp_start_date
+                 l_days       = 1
+
+                 print('Class Found')
+
+                 while l_days <= l_tp_days :
+                    m_movement = MemberMovement()
+                    l_d_status = 'N'
+                    week_end = [5, 6]
+
+                    if l_mr_date.weekday() in week_end:
+                        l_d_status = 'W'
+                        l_mr_mark = 'W'
+                    else:
+                        l_d_status = 'N'
+                        l_mr_mark = 'P'
+
+                    if ExcludedDay.objects.filter(ex_date=l_mr_date).exists():
+                        l_d_status = 'H'
+                        l_mr_mark = 'H'
+
+                    if l_mr_mark == 'W' :
+
+                        m_movement.mm_cm_num_id  = l_cm_num
+                        m_movement.mm_sc_code    = l_cm_sc_code
+                        m_movement.mm_date       = l_mr_date
+                        m_movement.mm_dr_status  = '0'
+                        m_movement.mm_pk_status  = '0'
+                        m_movement.mm_day        = l_days
+                        m_movement.mm_status     = '0'
+
+                        m_movement.save()
+
+                    l_days     = l_days + 1
+                    l_mr_date  = l_mr_date + datetime.timedelta(days=1)
+                    l_d_status = 'N'
+                    l_mr_mark  = 'P'
+
+            return redirect('genmovement')
+
+        return render(request, self.template_name, {'GenMovementForm': form})
 
 # Class member payment
 def SubmitPayView(request, pk, mr_cm_num):
@@ -1920,9 +2542,8 @@ def SubmitPayView(request, pk, mr_cm_num):
         else:
             form = ReceiptForm()
         return render(request, 'sadmin/payments/submitpay.html', {'form': form, 'new_payment': new_payment})
-
 def ReceiptView(request, mr_num):
-    #membrec = MemberRecord.objects.get(pk=pk)
+
     membrec = get_object_or_404(MemberRecord, mr_num=mr_num)
 
     new_receipt = None
@@ -2103,6 +2724,55 @@ def g_position(request):
 
     return render(request, 'sadmin/reports/charts/g_position.html', {'chart': dump})
 
+def GenderAnl(request):
+    dataset = ClassMember.objects.values('cm_sc_code').annotate(
+        tot_m=Count('cm_num', filter=Q(cm_gender='M')),
+        tot_f=Count('cm_num', filter=Q(cm_gender='F'))) \
+        .order_by('cm_sc_code')
+
+    s_class = list()
+    male_series_data = list()
+    female_series_data = list()
+
+    for entry in dataset:
+        s_class.append('%s s_class' % entry['cm_sc_code'])
+
+        male = entry['tot_m']
+        if male is None:
+            male = 0
+        male = abs(float(male))
+
+        female = entry['tot_f']
+        if female is None:
+            female = 0
+        female = abs(float(female))
+
+        male_series_data.append(male)
+        female_series_data.append(female)
+
+    male_series = {
+        'name': 'Males',
+        'data': male_series_data,
+        'color': 'purple'
+    }
+
+    female_series = {
+        'name': 'Female',
+        'data': female_series_data,
+        'color': 'Yellow'
+    }
+
+    chart = {
+        'chart': {'type': 'column'},
+        'title': {'text': 'Class Gender Analysis'},
+        'xAxis': {'s_class': s_class},
+        'series': [male_series, female_series]
+    }
+
+    dump = json.dumps(chart, cls=DecimalEncoder)
+
+    return render(request, 'sadmin/reports/charts/genderanl.html', {'chart': dump})
+
 class DecimalEncoder(json.JSONEncoder):
     def default(self, obj):
         #  if passed in object is instance of Decimal
@@ -2127,7 +2797,7 @@ def SubjectSchedView(request):
         return render(request, 'sadmin/reports/schedules/subjectlist.html', context)
 
 def SchClassSchedView(request):
-    dataset = SchoolClass.objects.filter(sc_status='1').values('sc_lv_code__lv_name', 'sc_desc', 'sc_code',\
+    dataset = SchoolClass.objects.filter(sc_status='1').values('sc_sl_code__sl_name', 'sc_desc', 'sc_code',\
               'sc_sf_num__sf_surname'). \
         annotate(cnt_class=Count('sc_code')).order_by('sc_lv_code', 'sc_desc')
 
@@ -2138,6 +2808,36 @@ def SchClassSchedView(request):
 
     return render(request, 'sadmin/reports/schedules/classlist.html', context)
 
+def ClassMemberListView(request, sc_code):
+        dataset = ClassMember.objects.filter(cm_sc_code=sc_code).values('cm_num', 'cm_sc_code', 'cm_sc_code__sc_desc',
+                  'cm_lv_code', 'cm_year','cm_surname', 'cm_fname', 'cm_othername','cm_guardian', 'cm_phone',
+                  'cm_email', 'cm_dob','cm_gender','cm_doj', 'cm_dol', 'cm_status').annotate(
+                  cnt_membs=Count('cm_num'), cnt_membf=Count('cm_num', filter=Q(cm_gender='F'))).order_by('cm_surname')
+
+        member_list = ClassMemberFilter(request.GET, queryset=dataset)
+        tot_membs = member_list.qs.aggregate(CntMembs=Sum('cnt_membs'))
+        tot_membf = member_list.qs.aggregate(CntMembf=Sum('cnt_membf'))
+        #tot_membm = member_list.qs.aggregate(CntMembm=Sum('cnt_membm'))
+
+        context = {'filter': member_list, 'tot_membs': tot_membs, 'tot_membf': tot_membf, }
+
+        return render(request, 'sadmin/reports/schedules/classmemblist.html', context)
+
+def MemberMvtListView(request, sc_code):
+    dataset = MemberMovement.objects.filter(mm_sc_code=sc_code).values('mm_num', 'mm_cm_num', 'mm_cm_num__cm_surname',
+              'mm_cm_num__cm_fname', 'mm_sc_code','mm_sc_code__sc_desc', 'mm_fs_num','mm_day', 'mm_date', 'mm_dr_ar_num','mm_dr_ar_num__ar_sname',
+              'mm_date_dr', 'mm_dr_status', 'mm_dr_notes','mm_pk_ar_num', 'mm_pk_ar_num__ar_sname','mm_date_pk',
+              'mm_pk_status', 'mm_pk_notes').annotate(cnt_membs=Count('mm_num'), cnt_dr=Count('mm_num', filter=Q(mm_dr_status='2')),
+               cnt_pk=Count('mm_num', filter=Q(mm_pk_status='0'))).order_by('mm_sc_code')
+
+    member_list = MemberMvtFilter(request.GET, queryset=dataset)
+    tot_membs = member_list.qs.aggregate(CntMembs=Sum('cnt_membs'))
+    tot_dr = member_list.qs.aggregate(CntDr=Sum('cnt_dr'))
+    tot_pk = member_list.qs.aggregate(CntPk=Sum('cnt_pk'))
+
+    context = {'filter': member_list, 'tot_membs': tot_membs, 'tot_dr': tot_dr, 'tot_pk': tot_pk}
+
+    return render(request, 'sadmin/reports/schedules/membmvtlist.html', context)
 def StaffSchedView(request):
         dataset = StaffMember.objects.filter(sf_status='1').values('sf_surname', 'sf_fname', 'sf_gender',
             'sf_dp_code__dp_name','sf_phone','sf_app_status').annotate(cnt_staff=Count('sf_num')).order_by('sf_surname')
@@ -2190,6 +2890,21 @@ def SpacesView(request):
     context = {'filter': spaces_list, 'space_tot': space_tot }
 
     return render(request, 'sadmin/reports/schedules/spacelist.html', context)
+
+def SlotsView(request):
+
+    dataset = SpaceSlot.objects.values('sp_num','sp_fs_num','sp_fc_num','sp_sc_code','sp_sf_num','sp_type',
+                                'sp_desc','sp_hrs','sp_date','sp_day','sp_start_time','sp_finish_time',
+                                'sp_fc_num__fc_desc','sp_fs_num__fs_desc','sp_sc_code__sc_desc',
+                                'sp_sf_num__sf_surname','sp_status').\
+              annotate(cnt_space=Count('sp_num')).order_by('sp_fs_num','sp_num')
+
+    slot_list = SpaceSlotFilter(request.GET, queryset=dataset)
+    slot_tot  = slot_list.qs.aggregate(CntSpace=Sum('cnt_space'))
+
+    context = {'filter': slot_list, 'slot_tot': slot_tot }
+
+    return render(request, 'sadmin/reports/schedules/slotlist.html', context)
 
 #Start Blog Views
 
@@ -2296,3 +3011,211 @@ def cont_remove(request, pk):
     contribution = get_object_or_404(PostContribution, pk=pk)
     contribution.delete()
     return redirect('bloghome')
+
+#Data Upload utilities
+# Upload Utility Tools
+import csv, tempfile, codecs
+from django.core.files.storage import default_storage
+def StaffUploadView(request):
+
+   #  declaring template
+    template = "sadmin/file_upload/member_upload1.html"
+
+    from django.utils.dateparse import parse_datetime
+
+    if request.method == "GET":
+        return render(request, template)
+
+# Allows to temporarily store files
+
+# Input file: get the name of the file
+    csv_file = request.FILES['file']
+    if not csv_file:
+            return "No File"
+
+    memb_list = default_storage.save(csv_file.name, csv_file)
+
+    csvfile = default_storage.open(memb_list, 'r')
+    reader = csv.reader(csvfile)
+
+    #reader = csv.reader(tempfile_path)
+
+    lines = list(reader)
+
+#import csv
+    from django.utils.dateparse import parse_datetime
+
+# Open the csv file and reads it into a two dimensional List
+    #f = request.FILES['file']
+    #with open("c:/nec/members2024v1.csv", 'rt') as f:
+    #with open('c:/starnec/testcase.csv', 'rt') as f:
+    #reader = csv.reader(r_file)
+    #lines = list(reader)
+
+# Create an empty list of objects of your model
+    objects = []
+
+# Iterate each record of the csv file
+    for line in lines:
+        obj = StaffMember()
+    # obj.mm_num=line[0],
+        obj.sf_dp_code_id = line[0]
+        obj.sf_surname = line[1]
+        obj.sf_fname = line[2]
+        obj.sf_othername = line[3]
+
+# Add the model to the list of objects
+    #objects.append(obj)
+        obj.save()
+
+        print(line[2])
+
+# Save all objects simultaniously, instead of saving for each line
+    #Member.objects.bulk_create(objects)
+    context = {}
+    return render(request, template, context)
+
+def DeptUploadView(request):
+
+   #  declaring template
+    template = "sadmin/file_upload/member_upload1.html"
+
+    if request.method == "GET":
+        return render(request, template)
+
+# Allows to temporarily store files
+
+# Input file: get the name of the file
+    csv_file = request.FILES['file']
+    if not csv_file:
+            return "No File"
+
+    dept_list = default_storage.save(csv_file.name, csv_file)
+
+    csvfile = default_storage.open(dept_list, 'r')
+    reader = csv.reader(csvfile)
+
+    lines = list(reader)
+
+
+# Iterate each record of the csv file
+    for line in lines:
+        obj = Dept()
+
+        obj.dp_code = line[0]
+        obj.dp_name = line[1]
+
+        obj.save()
+
+        #print(line[2])
+
+# Save all objects simultaniously, instead of saving for each line
+    context = {}
+    return render(request, template, context)
+
+
+def StaffUpdateView(request):
+    #  declaring template
+    template = "sadmin/file_upload/member_upload1.html"
+
+    from django.utils.dateparse import parse_datetime
+
+    if request.method == "GET":
+        return render(request, template)
+
+    # Allows to temporarily store files
+
+    # Input file: get the name of the file
+    csv_file = request.FILES['file']
+    if not csv_file:
+        return "No File"
+
+    memb_list = default_storage.save(csv_file.name, csv_file)
+
+    csvfile = default_storage.open(memb_list, 'r')
+    reader = csv.reader(csvfile)
+
+    # reader = csv.reader(tempfile_path)
+
+    lines = list(reader)
+
+    # import csv
+    from django.utils.dateparse import parse_datetime
+
+    # Open the csv file and reads it into a two dimensional List
+    # f = request.FILES['file']
+    # with open("c:/nec/members2024v1.csv", 'rt') as f:
+    # with open('c:/starnec/testcase.csv', 'rt') as f:
+    # reader = csv.reader(r_file)
+    # lines = list(reader)
+
+    # Create an empty list of objects of your model
+    objects = []
+
+    # Iterate each record of the csv file
+    for line in lines:
+        obj = StaffMember()
+        # obj.mm_num=line[0],
+        # obj.sf_dp_code_id = line[0]
+        # obj.sf_surname = line[1]
+        # obj.sf_fname = line[2]
+        # obj.sf_othername = line[3]
+        l_emp_code = line[0]
+        l_dpt_code = line[1]
+
+        StaffMember.objects.filter(sf_fname=l_emp_code).update(sf_dp_code=l_dpt_code)
+
+    # Add the model to the list of objects
+    # objects.append(obj)
+    # obj.save()
+
+    # print(line[2])
+
+    # Save all objects simultaniously, instead of saving for each line
+    # Member.objects.bulk_create(objects)
+    context = {}
+    return render(request, template, context)
+
+# Upload Utility Tools
+import csv, tempfile, codecs
+from django.core.files.storage import default_storage
+
+def VenueUploadView(request):
+
+   #  declaring template
+    template = "sadmin/file_upload/member_upload1.html"
+
+    if request.method == "GET":
+        return render(request, template)
+
+# Allows to temporarily store files
+
+# Input file: get the name of the file
+    csv_file = request.FILES['file']
+    if not csv_file:
+            return "No File"
+
+    dept_list = default_storage.save(csv_file.name, csv_file)
+
+    csvfile = default_storage.open(dept_list, 'r')
+    reader = csv.reader(csvfile)
+
+    lines = list(reader)
+
+
+# Iterate each record of the csv file
+    for line in lines:
+        obj = FacilitySpace()
+
+        facility = get_object_or_404(Facility, fc_code=line[0])
+
+        obj.fs_fc_num_id = facility.pk
+        obj.fs_desc = line[1]
+
+        obj.save()
+
+        #print(line[2])
+
+# Save all objects simultaniously, instead of saving for each line
+    context = {}
+    return render(request, template, context)

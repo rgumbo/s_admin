@@ -2,8 +2,8 @@
 from .models import Level,Subject,SchoolClass,LevelClass,ClassMember,LevelClassInstance,Dept,StaffMember,\
     StaffSubject,Facility,FacilitySpace,SpaceSlot,ClassAssessment,LearnerAssessment,DailyPlan,Schemes,\
     Syllabus, Currency,MemberRegister,TermParameter,ClassBilling,SubjectBilling,MemberRecord, Receipt,BlogPost\
-    , PostContribution,PostCategory,PostOrigin,PostContribution
-
+    , PostContribution,PostCategory,PostOrigin,PostContribution,ExcludedDay,SchoolLevel,ClassSubject,AuthRelation\
+    , MemberMovement
 
 from django.forms import ModelForm, widgets, DateTimeField, DateField, DateInput
 from django import forms
@@ -24,6 +24,18 @@ class CurrencyForm(forms.ModelForm):
                 #'od_status_date': widgets.DateInput(attrs={'type': 'date'}),
              }
 
+# Create the ExcludedDay form class
+class ExcludedDayForm(forms.ModelForm):
+        # meta class
+        class Meta:
+            model = ExcludedDay
+            # specify fields to be used
+            fields = ['ex_code','ex_name','ex_date','ex_status']
+            widgets = {
+                'ex_date': widgets.DateInput(attrs={'type': 'date'}),
+                #'od_status_date': widgets.DateInput(attrs={'type': 'date'}),
+             }
+
 # Create the Year Terms Parameters form class
 class TermParameterForm(forms.ModelForm):
         # meta class
@@ -31,11 +43,12 @@ class TermParameterForm(forms.ModelForm):
             model = TermParameter
             # specify fields to be used
             fields = ['tp_num','tp_year','tp_term','tp_weeks','tp_period_len','tp_cycledays','tp_days','tp_seats',
-                      'tp_start_date','tp_end_date','tp_status','tp_schemed','tp_billed']
+                      'tp_start_date','tp_end_date','tp_start_time','tp_end_time','tp_status','tp_schemed','tp_billed']
             widgets = {
                 'tp_start_date': widgets.DateInput(attrs={'type': 'date'}),
                 'tp_end_date': widgets.DateInput(attrs={'type': 'date'}),
-                #'od_status_date': widgets.DateInput(attrs={'type': 'date'}),
+                'tp_start_time': widgets.TimeInput(attrs={'type': 'time'}),
+                'tp_end_time': widgets.TimeInput(attrs={'type': 'time'}),
              }
 
 #Form for running the orders graphs
@@ -59,6 +72,12 @@ class GenRegiserForm(forms.Form):
         f_year = forms.IntegerField()
         f_term = forms.IntegerField()
         Gen_ok = forms.ChoiceField(choices=comm_choices)
+class GenSpaceLotForm(forms.Form):
+    comm_choices = (("Y", "Proceed"), ("N", "Stop"))
+    f_year = forms.IntegerField()
+    f_term = forms.IntegerField()
+    Gen_ok = forms.ChoiceField(choices=comm_choices)
+
 class GenBillForm(forms.Form):
         comm_choices = (("Y", "Proceed"), ("N", "Stop"))
         f_year = forms.IntegerField()
@@ -69,6 +88,15 @@ class GenClassForm(forms.Form):
         f_year = forms.IntegerField()
         f_term = forms.IntegerField()
         Gen_ok = forms.ChoiceField(choices=comm_choices)
+class GenLevelForm(forms.Form):
+    comm_choices = (("Y", "Proceed"), ("N", "Stop"))
+    l_code = forms.IntegerField()
+    Gen_ok = forms.ChoiceField(choices=comm_choices)
+
+class GenMovementForm(forms.Form):
+    comm_choices = (("Y", "Proceed"), ("N", "Stop"))
+    class_code = forms.CharField()
+    Gen_ok = forms.ChoiceField(choices=comm_choices)
 
 # Create the Level form class
 class LevelForm(forms.ModelForm):
@@ -76,7 +104,7 @@ class LevelForm(forms.ModelForm):
     class Meta:
         model = Level
         # specify fields to be used
-        fields = ['lv_code','lv_name','lv_status'] #'lv_sb_code',
+        fields = ['lv_code','lv_sl_code','lv_name','lv_status'] #'lv_sb_code',
         #widgets = {
          #   'ee_date_joined': widgets.DateInput(attrs={'type': 'date'}),
           #  'ee_dob': widgets.DateInput(attrs={'type': 'date'}),
@@ -89,6 +117,30 @@ class SubjectForm(forms.ModelForm):
         model = Subject
         # specify fields to be used
         fields = ['sb_code','sb_type','sb_desc', 'sb_hrs','sb_status']
+        #widgets = {
+         #   'ee_date_joined': widgets.DateInput(attrs={'type': 'date'}),
+          #  'ee_dob': widgets.DateInput(attrs={'type': 'date'}),
+         #}
+
+# Create the ClassSubject form class
+class ClassSubjectForm(forms.ModelForm):
+    # meta class
+    class Meta:
+        model = ClassSubject
+        # specify fields to be used
+        fields = ['cs_code','cs_sb_code','cs_name','cs_sl_code','cs_sc_code','cs_status']
+        #widgets = {
+         #   'ee_date_joined': widgets.DateInput(attrs={'type': 'date'}),
+          #  'ee_dob': widgets.DateInput(attrs={'type': 'date'}),
+         #}
+
+# Create the SchoolLevel form class
+class SchoolLevelForm(forms.ModelForm):
+    # meta class
+    class Meta:
+        model = SchoolLevel
+        # specify fields to be used
+        fields = ['sl_code','sl_name','sl_status']
         #widgets = {
          #   'ee_date_joined': widgets.DateInput(attrs={'type': 'date'}),
           #  'ee_dob': widgets.DateInput(attrs={'type': 'date'}),
@@ -133,7 +185,7 @@ class ClassMemberForm(forms.ModelForm):
             'cm_year': forms.HiddenInput(),
          }
 
-# Create the MemberRegister form class
+# Create the MemberRegister forms classes
 class MemberRegisterForm(forms.ModelForm):
     # meta class
     class Meta:
@@ -144,6 +196,146 @@ class MemberRegisterForm(forms.ModelForm):
             'mr_date': widgets.DateInput(attrs={'type': 'date'}),
             #'cm_doj': widgets.DateInput(attrs={'type': 'date'}),
             #'cm_dol': widgets.DateInput(attrs={'type': 'date'}),
+         }
+class MemberRegister1Form(forms.ModelForm):
+    # meta class
+    class Meta:
+        model = MemberRegister
+        # specify fields to be used
+        fields = ['mr_num','mr_sc_code','mr_year','mr_term','mr_mark_1','mr_cm_num','mr_comment','mr_date','mr_day','mr_status']
+        widgets = {
+            'mr_date': widgets.DateInput(attrs={'type': 'date'}),
+            #'cm_doj': widgets.DateInput(attrs={'type': 'date'}),
+            #'cm_dol': widgets.DateInput(attrs={'type': 'date'}),
+            'mr_sc_code': forms.HiddenInput(),
+            'mr_year': forms.HiddenInput(),
+            'mr_term': forms.HiddenInput(),
+            'mr_status': forms.HiddenInput(),
+         }
+class MemberRegister2Form(forms.ModelForm):
+    # meta class
+    class Meta:
+        model = MemberRegister
+        # specify fields to be used
+        fields = ['mr_num','mr_sc_code','mr_year','mr_term','mr_mark_2','mr_cm_num','mr_comment','mr_date','mr_day','mr_status']
+        widgets = {
+            'mr_date': widgets.DateInput(attrs={'type': 'date'}),
+            'mr_sc_code': forms.HiddenInput(),
+            'mr_year': forms.HiddenInput(),
+            'mr_term': forms.HiddenInput(),
+            'mr_status': forms.HiddenInput(),
+         }
+
+class MemberRegister3Form(forms.ModelForm):
+    # meta class
+    class Meta:
+        model = MemberRegister
+        # specify fields to be used
+        fields = ['mr_num','mr_sc_code','mr_year','mr_term','mr_mark_3','mr_cm_num','mr_comment','mr_date','mr_day','mr_status']
+        widgets = {
+            'mr_date': widgets.DateInput(attrs={'type': 'date'}),
+            'mr_sc_code': forms.HiddenInput(),
+            'mr_year': forms.HiddenInput(),
+            'mr_term': forms.HiddenInput(),
+            'mr_status': forms.HiddenInput(),
+         }
+
+class MemberRegister4Form(forms.ModelForm):
+    # meta class
+    class Meta:
+        model = MemberRegister
+        # specify fields to be used
+        fields = ['mr_num','mr_sc_code','mr_year','mr_term','mr_mark_4','mr_cm_num','mr_comment','mr_date','mr_day','mr_status']
+        widgets = {
+            'mr_date': widgets.DateInput(attrs={'type': 'date'}),
+            'mr_sc_code': forms.HiddenInput(),
+            'mr_year': forms.HiddenInput(),
+            'mr_term': forms.HiddenInput(),
+            'mr_status': forms.HiddenInput(),
+         }
+
+class MemberRegister5Form(forms.ModelForm):
+    # meta class
+    class Meta:
+        model = MemberRegister
+        # specify fields to be used
+        fields = ['mr_num','mr_sc_code','mr_year','mr_term','mr_mark_5','mr_cm_num','mr_comment','mr_date','mr_day','mr_status']
+        widgets = {
+            'mr_date': widgets.DateInput(attrs={'type': 'date'}),
+            'mr_sc_code': forms.HiddenInput(),
+            'mr_year': forms.HiddenInput(),
+            'mr_term': forms.HiddenInput(),
+            'mr_status': forms.HiddenInput(),
+         }
+
+class MemberRegister6Form(forms.ModelForm):
+    # meta class
+    class Meta:
+        model = MemberRegister
+        # specify fields to be used
+        fields = ['mr_num','mr_sc_code','mr_year','mr_term','mr_mark_6','mr_cm_num','mr_comment','mr_date','mr_day','mr_status']
+        widgets = {
+            'mr_date': widgets.DateInput(attrs={'type': 'date'}),
+            'mr_sc_code': forms.HiddenInput(),
+            'mr_year': forms.HiddenInput(),
+            'mr_term': forms.HiddenInput(),
+            'mr_status': forms.HiddenInput(),
+         }
+
+class MemberRegister7Form(forms.ModelForm):
+    # meta class
+    class Meta:
+        model = MemberRegister
+        # specify fields to be used
+        fields = ['mr_num','mr_sc_code','mr_year','mr_term','mr_mark_7','mr_cm_num','mr_comment','mr_date','mr_day','mr_status']
+        widgets = {
+            'mr_date': widgets.DateInput(attrs={'type': 'date'}),
+            'mr_sc_code': forms.HiddenInput(),
+            'mr_year': forms.HiddenInput(),
+            'mr_term': forms.HiddenInput(),
+            'mr_status': forms.HiddenInput(),
+         }
+
+class MemberRegister8Form(forms.ModelForm):
+    # meta class
+    class Meta:
+        model = MemberRegister
+        # specify fields to be used
+        fields = ['mr_num','mr_sc_code','mr_year','mr_term','mr_mark_8','mr_cm_num','mr_comment','mr_date','mr_day','mr_status']
+        widgets = {
+            'mr_date': widgets.DateInput(attrs={'type': 'date'}),
+            'mr_sc_code': forms.HiddenInput(),
+            'mr_year': forms.HiddenInput(),
+            'mr_term': forms.HiddenInput(),
+            'mr_status': forms.HiddenInput(),
+         }
+
+class MemberRegister9Form(forms.ModelForm):
+    # meta class
+    class Meta:
+        model = MemberRegister
+        # specify fields to be used
+        fields = ['mr_num','mr_sc_code','mr_year','mr_term','mr_mark_9','mr_cm_num','mr_comment','mr_date','mr_day','mr_status']
+        widgets = {
+            'mr_date': widgets.DateInput(attrs={'type': 'date'}),
+            'mr_sc_code': forms.HiddenInput(),
+            'mr_year': forms.HiddenInput(),
+            'mr_term': forms.HiddenInput(),
+            'mr_status': forms.HiddenInput(),
+         }
+
+class MemberRegister10Form(forms.ModelForm):
+    # meta class
+    class Meta:
+        model = MemberRegister
+        # specify fields to be used
+        fields = ['mr_num','mr_sc_code','mr_year','mr_term','mr_mark_10','mr_cm_num','mr_comment','mr_date','mr_day','mr_status']
+        widgets = {
+            'mr_date': widgets.DateInput(attrs={'type': 'date'}),
+            'mr_sc_code': forms.HiddenInput(),
+            'mr_year': forms.HiddenInput(),
+            'mr_term': forms.HiddenInput(),
+            'mr_status': forms.HiddenInput(),
          }
 
 # Create the LevelClassInstance form class
@@ -194,16 +386,18 @@ class DailyPlanForm(forms.ModelForm):
     class Meta:
         model = DailyPlan
         # specify fields to be used
-        fields = ['sp_num','sp_year','sp_term','sp_cycle','sp_day','sp_hrs','sp_area','sp_topic','sp_objective',
-                  'sp_absorption','sp_paction','sp_top','sp_middle','sp_lower',
-                  'sp_del_date','sp_plan_date','sp_start_time','sp_finish_time','sp_status'] #'sp_ch_num','sp_lc_num','sp_sc_code','sp_sb_code',
+        fields = ['sp_num','sp_ch_num','sp_lc_num','sp_sc_code','sp_sb_code','sp_year','sp_term','sp_cycle','sp_day',
+                  'sp_hrs','sp_area','sp_topic','sp_objective','sp_absorption','sp_paction','sp_top','sp_middle',
+                  'sp_lower','sp_hnotes','sp_del_date','sp_plan_date','sp_start_time','sp_finish_time','sp_status']
         widgets = {
             'sp_del_date': widgets.DateInput(attrs={'type': 'date'}),
             'sp_plan_date': widgets.DateInput(attrs={'type': 'date'}),
             'sp_start_time': widgets.TimeInput(attrs={'type': 'time'}),
             'sp_finish_time': widgets.TimeInput(attrs={'type': 'time'}),
-            # 'ch_year': forms.HiddenInput(),
-            # 'ch_term': forms.HiddenInput(),
+            'sp_ch_num': forms.HiddenInput(),
+            'sp_lc_num': forms.HiddenInput(),
+            'sp_sc_code': forms.HiddenInput(),
+            'sp_sb_code': forms.HiddenInput(),
          }
 
 # Create the ClassAssessment form class
@@ -251,12 +445,13 @@ class StaffMemberForm(forms.ModelForm):
     class Meta:
         model = StaffMember
         # specify fields to be used
-        fields = ['sf_num','sf_surname','sf_fname','sf_othername','sf_nok','sf_phone',
-                    'sf_email','sf_dob','sf_doj','sf_dol','sf_status','sf_gender','sf_app_status'] #'sf_dp_code',
+        fields = ['sf_num','sf_dp_code','sf_surname','sf_fname','sf_othername','sf_ll_code','sf_nok','sf_phone',
+                    'sf_email','sf_dob','sf_doj','sf_dol','sf_status','sf_gender','sf_app_status']
         widgets = {
             'sf_dob': widgets.DateInput(attrs={'type': 'date'}),
             'sf_doj': widgets.DateInput(attrs={'type': 'date'}),
             'sf_dol': widgets.DateInput(attrs={'type': 'date'}),
+            'sf_dp_code': forms.HiddenInput(),
          }
 
 # Create the StaffSubject form class
@@ -301,10 +496,13 @@ class SpaceSlotForm(forms.ModelForm):
     class Meta:
         model = SpaceSlot
         # specify fields to be used
-        fields = ['sp_num','sp_desc','sp_hrs','sp_fromtime','sp_totime','sp_status'] #'sp_fs_num',
+        fields = ['sp_num','sp_fs_num','sp_date','sp_day','sp_start_time','sp_finish_time','sp_sc_code',
+                  'sp_sf_num','sp_type','sp_desc','sp_hrs','sp_status']
         widgets = {
-            'sp_fromtime': widgets.DateTimeInput(attrs={'type': 'date'}),
-            'sp_totime': widgets.DateTimeInput(attrs={'type': 'date'}),
+            'sp_fs_num': forms.HiddenInput(),
+            'sp_date': widgets.DateInput(attrs={'type': 'date'}),
+            'sp_start_time': widgets.TimeInput(attrs={'type': 'time'}),
+            'sp_finish_time': widgets.TimeInput(attrs={'type': 'time'}),
          }
 
 # Create the ClassBilling form class
@@ -401,9 +599,39 @@ class MemberTransForm(forms.ModelForm):
             'mr_due_date'  : widgets.DateTimeInput(attrs={'type': 'date'}),
             }
 
-    # Start Blog forms
+# Create the authrelation form class
+class AuthRelationForm(forms.ModelForm):
+    # meta class
+    class Meta:
+        model = AuthRelation
+        # specify fields to be used
+        fields = ['ar_num', 'ar_cm_num', 'ar_sc_code', 'ar_sname', 'ar_fname', 'ar_nid', 'ar_phone', 'ar_email',
+                  'ar_status']
+        widgets = {
+                    'ar_cm_num': forms.HiddenInput(),
+                    'ar_sc_code': forms.HiddenInput(),
+                  }
 
-    # Start Interactions Form
+# Create the membermovement form class
+class MemberMovementForm(forms.ModelForm):
+    # meta class
+    class Meta:
+        model = MemberMovement
+        # specify fields to be used
+        fields = ['mm_num', 'mm_cm_num', 'mm_sc_code', 'mm_fs_num', 'mm_date', 'mm_day', 'mm_dr_ar_num', 'mm_date_dr',
+                  'mm_dr_status',
+                  'mm_dr_notes', 'mm_pk_ar_num', 'mm_date_pk', 'mm_pk_status', 'mm_pk_notes', 'mm_status']
+        widgets = {
+                    'mm_date': widgets.DateInput(attrs={'type': 'date'}),
+                    'mm_date_dr': widgets.TimeInput(attrs={'type': 'time'}),
+                    'mm_date_pk': widgets.TimeInput(attrs={'type': 'time'}),
+                    'mm_sc_code': forms.HiddenInput(),
+                    'mm_fs_num': forms.HiddenInput(),
+                  }
+
+ # Start Blog forms
+
+ # Start Interactions Form
 
 from django.db import models
 from .models import PostCategory, PostOrigin, BlogPost, PostContribution

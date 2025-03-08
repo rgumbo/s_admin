@@ -3,9 +3,10 @@ from django.db import models
 # Register your models here.
 
 from .models import Level,Subject,SchoolClass,LevelClass,ClassMember,LevelClassInstance,Dept,StaffMember,\
-    StaffSubject,Facility,FacilitySpace,SpaceSlot,ClassAssessment,LearnerAssessment,DailyPlan,\
-    Schemes,Syllabus,Currency,MemberRegister,TermParameter,ClassBilling,SubjectBilling,MemberRecord, Receipt,\
-   BlogPost ,PostContribution,PostCategory,PostOrigin,PostContribution
+     StaffSubject,Facility,FacilitySpace,SpaceSlot,ClassAssessment,LearnerAssessment,DailyPlan,\
+     Schemes,Syllabus,Currency,MemberRegister,TermParameter,ClassBilling,SubjectBilling,MemberRecord, Receipt,\
+     BlogPost ,PostContribution,PostCategory,PostOrigin,PostContribution,ExcludedDay,SchoolLevel,ClassSubject,\
+     AuthRelation , MemberMovement
 
 # Register your models here.
 
@@ -16,6 +17,13 @@ class CurrencyAdmin(admin.ModelAdmin):
 # Register the Currency admin class with the associated model
 admin.site.register(Currency, CurrencyAdmin)
 
+# Define the ExcludedDay admin class
+class ExcludedDayAdmin(admin.ModelAdmin):
+    list_display = ('ex_code','ex_name','ex_date','ex_status')
+
+# Register the ExcludedDay admin class with the associated model
+admin.site.register(ExcludedDay, ExcludedDayAdmin)
+
 # Define the TermParameter admin class
 class TermParameterAdmin(admin.ModelAdmin):
     list_display = ('tp_num','tp_year','tp_term','tp_weeks','tp_period_len','tp_cycledays','tp_days',
@@ -24,9 +32,16 @@ class TermParameterAdmin(admin.ModelAdmin):
 # Register the TermParameter admin class with the associated model
 admin.site.register(TermParameter, TermParameterAdmin)
 
+# Define the SchoolLevel admin class
+class SchoolLevelAdmin(admin.ModelAdmin):
+    list_display = ('sl_code','sl_name','sl_status')
+
+# Register the SchoolLevel admin class with the associated model
+admin.site.register(SchoolLevel, SchoolLevelAdmin)
+
 # Define the Level admin class
 class LevelAdmin(admin.ModelAdmin):
-    list_display = ('lv_code','lv_sb_code','lv_name','lv_status')
+    list_display = ('lv_code','lv_sb_code','lv_name','lv_status','ad_date_c','ad_date_a')
 
 # Register the Level admin class with the associated model
 admin.site.register(Level, LevelAdmin)
@@ -37,6 +52,13 @@ class SubjectAdmin(admin.ModelAdmin):
 
 # Register the Subject admin class with the associated model
 admin.site.register(Subject, SubjectAdmin)
+
+# Define the ClassSubject admin class
+class ClassSubjectAdmin(admin.ModelAdmin):
+    list_display = ('cs_code','cs_name','cs_sl_code','cs_sc_code','cs_sb_code','cs_lv_code','cs_sf_num','cs_status')
+
+# Register the Subject admin class with the associated model
+admin.site.register(ClassSubject, ClassSubjectAdmin)
 
 # Define the SchoolClass admin class
 class SchoolClassAdmin(admin.ModelAdmin):
@@ -158,14 +180,15 @@ admin.site.register(FacilitySpace, FacilitySpaceAdmin)
 
 # Define the SpaceSlot admin class
 class SpaceSlotAdmin(admin.ModelAdmin):
-    list_display = ('sp_num','sp_fs_num','sp_desc','sp_hrs','sp_fromtime','sp_totime','sp_status')
+    list_display = ('sp_num','sp_fs_num','sp_sc_code','sp_sf_num','sp_type','sp_desc',
+                    'sp_hrs','sp_date','sp_day','sp_start_time','sp_finish_time','sp_status')
 
 # Register the SpaceSlot admin class with the associated model
 admin.site.register(SpaceSlot, SpaceSlotAdmin)
 
 # Define the ClassBilling admin class
 class ClassBillingAdmin(admin.ModelAdmin):
-    list_display = ('cb_num','cb_sc_code','cb_lv_code','cb_type','cb_desc','cb_rate','cb_year','cb_term','cb_status')
+    list_display = ('cb_num','cb_sc_code','cb_sl_code','cb_lv_code','cb_type','cb_desc','cb_rate','cb_year','cb_term','cb_status')
 
 # Register the SpaceSlot admin class with the associated model
 admin.site.register(ClassBilling, ClassBillingAdmin)
@@ -196,6 +219,21 @@ class ReceiptAdmin(admin.ModelAdmin):
 
 # Register the Receipt admin class with the associated model
 admin.site.register(Receipt, ReceiptAdmin)
+
+# Define the authrelation admin class
+class AuthRelationAdmin(admin.ModelAdmin):
+    list_display = ('ar_num','ar_cm_num','ar_sc_code','ar_sname','ar_fname','ar_nid','ar_phone','ar_email','ar_status')
+
+# Register the authrelation admin class with the associated model
+admin.site.register(AuthRelation, AuthRelationAdmin)
+
+# Define the membermovement admin class
+class MemberMovementAdmin(admin.ModelAdmin):
+    list_display = ('mm_num','mm_cm_num','mm_sc_code','mm_fs_num','mm_date','mm_day','mm_dr_ar_num','mm_date_dr',
+                    'mm_dr_status','mm_dr_notes','mm_pk_ar_num','mm_date_pk','mm_pk_status','mm_pk_notes','mm_status')
+
+# Register the membermovement admin class with the associated model
+admin.site.register(MemberMovement, MemberMovementAdmin)
 
 # Blog Models admin registration Start here
 # Define the PostCategory admin class

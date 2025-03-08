@@ -29,8 +29,7 @@ Day Plans Listing
     <thead>
      <tr>
         <th>Day Plan</th>
-        <th>P. Date</th>
-        <th>Del. Date</th>
+        <th>Date</th>
         <th>Cycle</th>
         <th>Day</th>
         <th>Class</th>
@@ -41,6 +40,7 @@ Day Plans Listing
         <th>Area</th>
         <th>Rating</th>
         <th>Edit</th>
+        <th>Register</th>
      </tr>
 
    </thead>
@@ -48,7 +48,6 @@ Day Plans Listing
         <tr>
         {% for clss in filter.qs %}
             <td> {{ clss.sp_num }} </td>
-            <td> {{ clss.sp_plan_date|date:'d-M-Y' }} </td>
             <td> {{ clss.sp_del_date|date:'d-M-Y' }} </td>
             <td> {{ clss.sp_cycle }} </td>
             <td> {{ clss.sp_day }} </td>
@@ -59,7 +58,8 @@ Day Plans Listing
             <td> {{ clss.sp_finish_time }} </td>
             <td> {{ clss.sp_area }} </td>
             <td> {{ clss.sp_absorption }} </td>
-            <td><a href="{% url 'editdailyplan' clss.sp_num %}">  Edit   </a>  </td>
+            <td><a href="{% url 'editdailyplan' clss.sp_num %}">  Edit     </a>  </td>
+            <td><a href="{% url 'memberregister' clss.sp_sc_code clss.sp_del_date%}">  Register </a>  </td>
         </tr>
         {% endfor %}
 

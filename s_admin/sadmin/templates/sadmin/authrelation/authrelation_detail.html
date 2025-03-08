@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container-fluid">
+<div class="row"></div>
+<br/>
+<div class="row">
+ <div class="col-md-1 col-xs-1 col-sm-1">
+ </div>
+
+ <div class="col-md-8 col-xs-8 col-sm-8">
+  <p class="h2"> Class       : {{relation.ar_sc_code}}</p>
+  <p class="h2"> Member      : {{relation.ar_cm_num}}</p>
+  <p class="h2"> Surname     : {{relation.ar_sname}}</p>
+  <p class="h2"> First Name  : {{relation.ar_fname}}</p>
+  <p class="h2"> National ID : {{relation.ar_nid}}</p>
+  <p class="h2"> Phone       : {{relation.ar_phone}}</p>
+  <p class="h2"> Status      : {{relation.ar_status}}</p>
+
+ </div>
+
+<div class="row"> </div>
+ <div class="col-md-1 col-xs-1 col-sm-1"></div>
+ <div class="col-md-10 col-xs-10 col-sm-10">
+
+ </div>
+ <div class="col-md-1 col-xs-1 col-sm-1"></div>
+</div>
+</div>
+{% endblock %}

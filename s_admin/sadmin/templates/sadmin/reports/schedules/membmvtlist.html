@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+
+<body>{% block content %}
+
+<br>
+<br>
+<br>
+
+Class Member Movement Listing
+
+<br>
+<br>
+  <form style="margin-left:2.5em" method="get">
+    {{ filter.form.as_p }}
+
+    <button type="submit">Search</button>
+  </form>
+
+<div> <aside id="rightsidebar">
+    <div class="col-md-10 col-xs-10 col-sm-10">
+    <nav id="nav">
+
+      <br>
+      Total Members ......................:  {{ tot_membs.CntMembs|floatformat:0 }}
+      <br>
+      Total Placed...........................:  {{ tot_dr.CntDr|floatformat:0 }}
+      <br>
+      Total Not Picked....................:  {{ tot_pk.CntPk|floatformat:0 }}
+      <br>
+      <br>
+
+    <table class="content" border="2px">
+    <thead>
+
+     <tr>
+        <th>Class</th>
+        <th>Date </th>
+        <th>Surname</th>
+        <th>First Name</th>
+
+        <th>Place?</th>
+        <th>Place By</th>
+        <th>Time</th>
+        <th>Place Notes</th>
+
+        <th>Picked?</th>
+        <th>Picked By</th>
+        <th>Time</th>
+        <th>Picked Notes</th>
+        <th>Edit</th>
+     </tr>
+   </thead>
+
+   <tbody>
+        <tr>
+        {% for cont in filter.qs %}
+
+            <td> {{ cont.mm_sc_code__sc_desc}} </td>
+            <td> {{ cont.mm_date|date:'d-M-Y' }} </td>
+            <td> {{ cont.mm_cm_num__cm_surname }} </td>
+            <td> {{ cont.mm_cm_num__cm_fname }} </td>
+
+            <td> {{ cont.mm_dr_status }} </td>
+            <td> {{ cont.mm_dr_ar_num__ar_sname }} </td>
+            <td> {{ cont.mm_date_dr|time }} </td>
+            <td> {{ cont.mm_dr_notes }} </td>
+
+            <td> {{ cont.mm_pk_status }} </td>
+            <td> {{ cont.mm_pk_ar_num__ar_sname }} </td>
+            <td> {{ cont.mm_date_pk|time }} </td>
+            <td> {{ cont.mm_pk_notes }} </td>
+
+            <td><a href="{% url 'editmembermovement' cont.mm_num %}">  edit  </a>  </td>
+
+        </tr>
+        {% endfor %}
+
+    </tbody>
+
+    </table>
+     </nav>
+      </div>
+
+ </aside> </div>
+</body>
+{% endblock %}
+</html>

@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container-fluid">
+<div class="row"></div>
+<br/>
+<div class="row">
+ <div class="col-md-1 col-xs-1 col-sm-1">
+ </div>
+
+ <div class="col-md-8 col-xs-8 col-sm-8">
+
+  <p class="h2"> Class            : {{member.mm_sc_code}}</p>
+  <p class="h2"> Member           : {{member.mm_cm_num}}</p>
+  <p class="h2"> Date             : {{member.mm_date}}</p>
+  <p class="h2"> Placement Status : {{member.mm_dr_status}}</p>
+  <p class="h2"> Picking Status   : {{member.mm_pk_status}}</p>
+  <p class="h2"> Status           : {{member.mm_status}}</p>
+
+ </div>
+
+<div class="row"> </div>
+ <div class="col-md-1 col-xs-1 col-sm-1"></div>
+ <div class="col-md-10 col-xs-10 col-sm-10">
+
+ </div>
+ <div class="col-md-1 col-xs-1 col-sm-1"></div>
+</div>
+</div>
+{% endblock %}

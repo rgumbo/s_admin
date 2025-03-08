@@ -15,11 +15,33 @@ urlpatterns = [
     path('subject/', views.SubjectIndexView.as_view(), name='subject'),
     path('deletesubject/<str:pk>/', views.DeleteSubject, name='deletesubject'),
 
+    path('addclasssubject/str<pk>/', views.ClassSubjectView, name='addclasssubject'),
+    #path('addclasssubject_a/', views.ClassSubjectView1, name='addclasssubject_a'),
+    path('classsubjectdetail/str<pk>/', views.ClassSubjectDetailView.as_view(), name='classsubjectdetail'),
+    path('editclasssubject/<str:pk>/', views.EditClassSubject, name='editclasssubject'),
+    path('classsubject<str:sc_code>/', views.ClassSubjectIndexView.as_view(), name='classsubject'),
+    # path('classsubjectall/', views.ClassSubjectAllIndexView.as_view(), name='classsubjectall'),
+    path('deleteclasssubject/<str:pk>/', views.DeleteClassSubject, name='deleteclasssubject'),
+
     path('addtermparameter', views.TermParameterView, name='addtermparameter'),
     path('termparameterdetail/str<pk>/', views.TermParameterDetailView.as_view(), name='termparameterdetail'),
     path('edittermparameter/<str:pk>/', views.EditTermParameter, name='edittermparameter'),
     path('termparameter/', views.TermParameterIndexView.as_view(), name='termparameter'),
     path('deletetermparameter/<str:pk>/', views.DeleteTermParameter, name='deletetermparameter'),
+
+    path('addexcludedday', views.ExcludedDayView, name='addexcludedday'),
+    path('excludeddaydetail/str<pk>/', views.ExcludedDayDetailView.as_view(), name='excludeddaydetail'),
+    path('editexcludedday/<str:pk>/', views.EditExcludedDay, name='editexcludedday'),
+    path('excludedday/', views.ExcludedDayIndexView.as_view(), name='excludedday'),
+    path('deleteexcludedday/<str:pk>/', views.DeleteExcludedDay, name='deleteexcludedday'),
+
+    path('addslevel', views.SchoolLevelView, name='addslevel'),
+    path('sleveldetail/str<pk>/', views.SchoolLevelDetailView.as_view(), name='sleveldetail'),
+    path('editslevel/<str:pk>/', views.EditSchoolLevel, name='editslevel'),
+    path('slevel/', views.SchoolLevelIndexView.as_view(), name='slevel'),
+    #path('sublevelrates/', views.SubjectBillingIndex_rView.as_view(), name='sublevelrates'),
+    path('schlevelrates/', views.SchoolLevelIndexBillView.as_view(), name='schlevelrates'),
+    path('deleteslevel/<str:pk>/', views.DeleteSchoolLevel, name='deleteslevel'),
 
     path('adddept', views.DeptView, name='adddept'),
     path('deptdetail/str<pk>/', views.DeptDetailView.as_view(), name='deptdetail'),
@@ -98,6 +120,7 @@ urlpatterns = [
     path('addlevel/str<pk>/', views.LevelView, name='addlevel'),
     path('leveldetail/str<pk>/', views.LevelDetailView.as_view(), name='leveldetail'),
     path('editlevel/<str:pk>/', views.EditLevel, name='editlevel'),
+    #path('level<str:pk>/', views.LevelIndexView.as_view(), name='level'),
     path('level<str:pk>/', views.LevelIndexView.as_view(), name='level'),
     path('alllevels/', views.LevelListView.as_view(), name='alllevels'),
     path('deletelevel/<str:pk>/', views.DeleteLevel, name='deletelevel'),
@@ -136,8 +159,12 @@ urlpatterns = [
     path('deletedailyplan/<str:pk>/', views.DeleteDailyPlan, name='deletedailyplan'),
 
     path('addclassmember/str<pk>/', views.ClassMemberView, name='addclassmember'),
+    path('crreatestudent/str<pk>/', views.CreateStudentView, name='crreatestudent'),
+
     path('classmemberdetail/str<pk>/', views.ClassMemberDetailView.as_view(), name='classmemberdetail'),
     path('editclassmember/<str:pk>/', views.EditClassMember, name='editclassmember'),
+    path('editstudent/<str:cm_num>/', views.EditStudent, name='editstudent'),
+
     path('viewstudent/<mr_cm_num>/', views.EditClassMember1, name='viewstudent'),
     path('classmember<str:pk>/', views.ClassMemberIndexView.as_view(), name='classmember'),
     # path('classmemberall/', views.ClassMemberAllIndexView.as_view(), name='classmemberall'),
@@ -165,6 +192,22 @@ urlpatterns = [
     # path('memberregisterall/', views.MemberRegisterAllIndexView.as_view(), name='memberregisterall'),
     path('deletememberregister/<str:pk>/', views.DeleteMemberRegister, name='deletememberregister'),
 
+    path('addauthrelation/str<cm_num>/', views.AuthRelationView, name='addauthrelation'),
+    path('authrelationdetail/str<pk>/', views.AuthRelationDetailView.as_view(), name='authrelationdetail'),
+    path('editauthrelation/<str:pk>/', views.EditAuthRelation, name='editauthrelation'),
+    #path('viewauthrelation/<int:mr_num>/', views.EditAuthRelation1, name='viewauthrelation'),
+    path('authrelation<str:pk>/', views.AuthRelationIndexView.as_view(), name='authrelation'),
+    # path('authrelationall/', views.AuthRelationAllIndexView.as_view(), name='authrelationall'),
+    path('deleteauthrelation/<str:pk>/', views.DeleteAuthRelation, name='deleteauthrelation'),
+
+    path('addmembermovement/str<pk>/', views.MemberMovementView, name='addmembermovement'),
+    path('membermovementdetail/str<pk>/', views.MemberMovementDetailView.as_view(), name='membermovementdetail'),
+    path('editmembermovement/<str:pk>/', views.EditMemberMovement, name='editmembermovement'),
+    # path('viewmembermovement/<int:mr_num>/', views.EditMemberMovement1, name='viewmembermovement'),
+    path('membermovement<str:pk>/', views.MemberMovementIndexView.as_view(), name='membermovement'),
+    # path('membermovementall/', views.MemberMovementAllIndexView.as_view(), name='membermovementall'),
+    path('deletemembermovement/<str:pk>/', views.DeleteMemberMovement, name='deletemembermovement'),
+
     path('ratesschoolclass/', views.SchoolClassRatesIndexView.as_view(), name='ratesschoolclass'),
     path('rateslevelclass/', views.LevelClassRatesIndexView.as_view(), name='rateslevelclass'),
     path('addratesschool/str<pk>/', views.ClassBillingView, name='addratesschool'),
@@ -177,14 +220,25 @@ urlpatterns = [
 
     path('classlist', views.ClassListView, name='classlist'),
     path('schemeslist', views.SchemesListView, name='schemeslist'),
-    path('dayplanlist/<str:sc_code>', views.DailyPlanListView, name='dayplanlist'),
+    path('dayplanlist/<str:ch_num>', views.DailyPlanListView, name='dayplanlist'),
+    path('classplanlist/<str:sc_code>', views.ClassDailyPlanListView, name='classplanlist'),
     path('classassessmentlist/<str:sc_code>', views.ClassAssessmentListView, name='classassessmentlist'),
     path('learnerassesslist/<int:as_num>', views.LearnerAssessmentListView, name='learnerassesslist'),
-    path('memberregister/<str:sc_code>', views.MemberRegisterListView, name='memberregister'),
+    path('memberregister/<str:sc_code>/date<sp_del_date>', views.MemberRegisterListView, name='memberregister'),
+    path('students/<str:sc_code>', views.ClassMemberListView, name='students'),
 
     path('genscheme', views.GenSchemeView.as_view(), name='genscheme'),
     path('genregister', views.GenRegisterView.as_view(), name='genregister'),
     path('genclasseats', views.GenSeatsView.as_view(), name='genclasseats'),
+    path('genlevel', views.GenLevelView.as_view(), name='genlevel'),
+    path('genspacelot', views.GenSpaceLotView.as_view(), name='genspacelot'),
+    path('genmovement', views.GenMovementView.as_view(), name='genmovement'),
+
+    #Upload Utilities
+    path('staffupload', views.StaffUploadView, name='staffupload'),
+    path('deptupload', views.DeptUploadView, name='deptupload'),
+    path('staffupdate', views.StaffUpdateView, name='staffupdate'),
+    path('venueupload', views.VenueUploadView, name='venueupload'),
 
     path('memberpay/<int:mr_num>/', views.MemberPayView,name='memberpay'),
     path('editmembrec/<int:mr_num>/', views.EditMemberRecordView, name='editmembrec'),
@@ -193,6 +247,7 @@ urlpatterns = [
     path('snapshot', views.SnapShotView, name='snapshot'),
     path('paylist', views.PayListView, name='paylist'),
     path('g_position', views.g_position, name='g_position'),
+    path('genderanl', views.GenderAnl, name='genderanl'),
 
 #Subject Schedules
 
@@ -202,7 +257,9 @@ urlpatterns = [
     path('schemesched', views.SchmeSchedView, name='schemesched'),
     path('attendsched', views.MemberRegView, name='attendsched'),
     path('spacesched', views.SpacesView, name='spacesched'),
+    path('slotsched', views.SlotsView, name='slotsched'),
     path('studentacc/<int:mr_cm_num>/', views.StudentAccView, name='studentacc'),
+    path('membermvt/<str:sc_code>/', views.MemberMvtListView, name='membermvt'),
 
  #   path('i_flash', views.InstFlashView, name='i_flash'),
   #  path('i_summary', views.HoldingInstSearchView, name='i_summary'),

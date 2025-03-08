@@ -47,7 +47,7 @@ Attendance Exceptions Listing
             <td> {{ cont.mr_sc_code__sc_desc }} </td>
             <td> {{ cont.mr_cm_num__cm_surname }} </td>
             <td> {{ cont.mr_cm_num__cm_fname }} </td>
-            <td> {{ cont.mr_date }} </td>
+            <td> {{ cont.mr_date|date:'d-M-Y' }} </td>
             <td> {{ cont.mr_mark }} </td>
             <td> <a href="{% url 'viewstudent' cont.mr_cm_num %}"> View </a> </td>
          </tr>

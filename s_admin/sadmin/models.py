@@ -21,13 +21,15 @@ class TermParameter(models.Model):
     tp_weeks      = models.IntegerField(verbose_name='Weeks',  default=0, help_text='Weeks in term', null=True, blank=True)
     tp_period_len = models.IntegerField(verbose_name='Period Length',  default=30, help_text='Length of period in minutes', null=True, blank=True)
     tp_days       = models.IntegerField(verbose_name='Days', default=0, help_text='Days in term', null=True, blank=True)
-    tp_seats      = models.IntegerField(verbose_name='General Seats', help_text='General number of seats per class')
+    tp_seats      = models.IntegerField(verbose_name='General Seats', null=True, blank=True, help_text='General number of seats per class')
     tp_cycledays  = models.IntegerField(verbose_name=' Cycle Days', default=5, help_text='Days in Cycle', null=True, blank=True)
-    tp_start_date = models.DateTimeField(verbose_name='Start Date', help_text='Opening Day')
-    tp_end_date   = models.DateTimeField(verbose_name='End Date', help_text='Closng Day')
+    tp_start_date = models.DateTimeField(verbose_name='Start Date', null=True, blank=True, help_text='Opening Day')
+    tp_end_date   = models.DateTimeField(verbose_name='End Date', null=True, blank=True, help_text='Closng Day')
+    tp_start_time = models.DateTimeField(verbose_name='Start Time', null=True, blank=True, help_text='Business start time')
+    tp_end_time   = models.DateTimeField(verbose_name='End Time', null=True, blank=True, help_text='Business finishing time')
     tp_status     = models.CharField(verbose_name='Status', max_length=1, choices=status_choice, default='1', help_text='Status')
     tp_schemed    = models.CharField(verbose_name='Schemed?', max_length=1, choices=schstatus_choice, default='0', help_text='Schemed')
-    tp_billed    = models.CharField(verbose_name='Billed ?', max_length=1, choices=billstatus_choice, default='N', help_text='Billed')
+    tp_billed     = models.CharField(verbose_name='Billed ?', max_length=1, choices=billstatus_choice, default='N', help_text='Billed')
     ad_user_c     = models.CharField(max_length=30, blank=True, null=True, help_text='The user creating the record')
     ad_user_a     = models.CharField(max_length=30, blank=True, null=True, help_text='The last amending user')
     ad_date_c     = models.DateTimeField(auto_now_add=True, help_text='Date record was created')
@@ -84,14 +86,70 @@ class Currency(models.Model):
     def get_post_url(self):
         return reverse('edit', kwargs={'pk': self.pk})
 
+#ExcludedDay - class representing days Excluded fron school programmes
+class ExcludedDay(models.Model):
+    ex_status_choices = (('1', 'Active'), ('0', 'Inactive'))
+
+    ex_code       = models.CharField(verbose_name='Code',max_length=10,primary_key=True, help_text='Code uniquely identify a Excluded Days')
+    ex_name       = models.CharField(verbose_name='Name',max_length=50, help_text='The name of Excluded day/Holiday')
+    ex_date       = models.DateTimeField(verbose_name='Date',help_text='The date of the excluded Holiday/Date')
+    ex_status     = models.CharField(verbose_name='Status',max_length=1, choices=ex_status_choices, help_text='Status of the exclusion', default='1')
+    ad_user_c     = models.CharField(max_length=30, blank=True, null=True, help_text='The user creating the record')
+    ad_user_a     = models.CharField(max_length=30, blank=True, null=True, help_text='The last amending user')
+    ad_date_c     = models.DateTimeField(auto_now_add=True, help_text='Date record was created')
+    ad_date_a     = models.DateTimeField(auto_now=True, help_text='Date record was last amended')
+    ad_device_c   = models.CharField(max_length=100, blank=True, null=True, help_text='The Device creating the record')
+    ad_device_a   = models.CharField(max_length=100, blank=True, null=True, help_text='The Last amending device')
+    ad_ipadress_c = models.CharField(max_length=50, blank=True, null=True, help_text='The record creating ip address')
+    ad_ipadress_a = models.CharField(max_length=50, blank=True, null=True, help_text='The last amending ip address')
+
+    class Meta:
+        ordering = ['ex_date']
+        verbose_name = 'excludedday'
+
+    def __str__(self):
+        return self.ex_name
+
+    def get_absolute_url(self):
+        return reverse('Index', args=[str(self.ex_code)])
+
+    def get_post_url(self):
+        return reverse('edit', kwargs={'pk': self.pk})
+
+#SchoolLevel - Class representing the classification of study classes
+class SchoolLevel(models.Model):
+    sl_status_choices = (('1', 'Active'), ('0', 'Inactive'))
+
+    sl_code = models.CharField(verbose_name='Code',max_length=10,primary_key=True, help_text='Code uniquely identify a school level')
+    sl_name = models.CharField(verbose_name='name',max_length=10, help_text='The name of school level')
+    sl_status = models.CharField(verbose_name='Status',max_length=1, choices=sl_status_choices, help_text='Status of the school level', default='1')
+    ad_user_c = models.CharField(max_length=30, blank=True, null=True, help_text='The user creating the record')
+    ad_user_a = models.CharField(max_length=30, blank=True, null=True, help_text='The last amending user')
+    ad_date_c = models.DateTimeField(auto_now_add=True, help_text='Date record was created')
+    ad_date_a = models.DateTimeField(auto_now=True, help_text='Date record was last amended')
+    ad_device_c = models.CharField(max_length=100, blank=True, null=True, help_text='The Device creating the record')
+    ad_device_a = models.CharField(max_length=100, blank=True, null=True, help_text='The Last amending device')
+    ad_ipadress_c = models.CharField(max_length=50, blank=True, null=True, help_text='The record creating ip address')
+    ad_ipadress_a = models.CharField(max_length=50, blank=True, null=True, help_text='The last amending ip address')
+
+    class Meta:
+        ordering = ['sl_code']
+        verbose_name = 'SchoolLevel'
+    def __str__(self):
+        return self.sl_name
+    def get_absolute_url(self):
+        return reverse('Index', args=[str(self.sl_code)])
+    def get_post_url(self):
+        return reverse('edit', kwargs={'pk': self.pk})
+
 #Dept -  Class representing the departments
 
 class Dept(models.Model):
     dp_status_choices = (('1', 'Active'), ('0', 'Inactive'))
 
     dp_code = models.CharField(verbose_name='Code',max_length=10,primary_key=True, help_text='Code uniquely identify a department')
-    dp_name = models.CharField(verbose_name='name',max_length=10, help_text='The name of department')
-    dp_status = models.CharField(verbose_name='Status',max_length=1, choices=dp_status_choices, help_text='Status of the currency', default='1')
+    dp_name = models.CharField(verbose_name='name',max_length=50, help_text='The name of department')
+    dp_status = models.CharField(verbose_name='Status',max_length=1, choices=dp_status_choices, help_text='Status of the department', default='1')
     ad_user_c = models.CharField(max_length=30, blank=True, null=True, help_text='The user creating the record')
     ad_user_a = models.CharField(max_length=30, blank=True, null=True, help_text='The last amending user')
     ad_date_c = models.DateTimeField(auto_now_add=True, help_text='Date record was created')
@@ -118,19 +176,21 @@ class Dept(models.Model):
 class StaffMember(models.Model):
     app_status_type_choice = (('1', 'Academic'), ('2', 'Sport'), ('3', 'Extra Carricular'))
     status_choice = (('1', 'Applicant'), ('2', 'Engaged'), ('3', 'Discharged'), ('4', 'Pending'), ('5', 'On Leave'))
+    level_choice = (('1', 'Senoir Qualified'), ('2', 'Qualified'), ('3', 'Intern'), ('4', 'General'))
     gender_choice = (('F', 'Female'), ('M', 'Male'))
 
     sf_num = models.AutoField(verbose_name='Member ID', primary_key=True,help_text='Code uniquely identify a Staff Member')
     sf_dp_code = models.ForeignKey(Dept,on_delete=models.CASCADE,verbose_name='Department', help_text='Staff member s department')
     sf_surname = models.CharField(verbose_name='Surame', max_length=100, help_text='Staff Member Surname')
-    sf_fname = models.CharField(verbose_name='First Name', max_length=100, help_text='Staff Member First Name')
-    sf_othername = models.CharField(verbose_name='Other Name', max_length=100, help_text='Staff Member s Other Name')
-    sf_nok = models.CharField(verbose_name='Next Of Kin', max_length=100, help_text='Staff Member s next of kin')
-    sf_phone = models.CharField(verbose_name='Phone', max_length=100, help_text='Contact phone')
-    sf_email = models.CharField(verbose_name='Email', max_length=100, help_text='Contact Email')
-    sf_dob = models.DateTimeField(verbose_name='Date Of Birth', help_text='Date of birth')
-    sf_doj = models.DateTimeField(verbose_name='Date joined', help_text='Date Joined')
-    sf_dol = models.DateTimeField(verbose_name='Date of Leaving', help_text='Date of leaving')
+    sf_fname = models.CharField(verbose_name='First Name', default='Tba', max_length=100, help_text='Staff Member First Name')
+    sf_othername = models.CharField(verbose_name='Other Name', default='Tba', max_length=100, help_text='Staff Member s Other Name')
+    sf_ll_code   = models.CharField(verbose_name='Level', max_length=1, choices=level_choice, default='1', help_text='Staff Lvel')
+    sf_nok = models.CharField(verbose_name='Next Of Kin', default='Tba', max_length=100, help_text='Staff Member s next of kin')
+    sf_phone = models.CharField(verbose_name='Phone', default='Tba', max_length=100, help_text='Contact phone')
+    sf_email = models.CharField(verbose_name='Email', default='Tba', max_length=100, help_text='Contact Email')
+    sf_dob = models.DateTimeField(verbose_name='Date Of Birth', blank=True, null=True, help_text='Date of birth')
+    sf_doj = models.DateTimeField(verbose_name='Date joined', blank=True, null=True, help_text='Date Joined')
+    sf_dol = models.DateTimeField(verbose_name='Date of Leaving', blank=True, null=True, help_text='Date of leaving')
     sf_status = models.CharField(verbose_name='Status', max_length=1, choices=status_choice, default='1', help_text='Status')
     sf_gender = models.CharField(verbose_name='Gender', max_length=1, choices=gender_choice, default='1', help_text='Gender')
     sf_app_status = models.CharField(verbose_name='Staff Type', max_length=1, choices=app_status_type_choice, default='1', help_text='Indicates Tyoe e.g. Academic')
@@ -165,6 +225,7 @@ class Subject(models.Model):
     sb_type		=	models.CharField(verbose_name='Type', max_length=1,choices=type_choice, help_text='Type of the Subject')
     sb_desc		=	models.CharField(verbose_name='Name', max_length=100, help_text='The description of the Subject')
     sb_hrs		=	models.DecimalField(verbose_name='Req. Hrs',max_digits=10, decimal_places=2, default=0, help_text='Required hrs for Subject', null=True, blank=True)
+    sb_num		=	models.IntegerField(verbose_name='Subject Number', help_text='Number for linking with register', null=True, blank=True)
     sb_status	=	models.CharField(verbose_name='Status', max_length=1,choices=status_choice,default='1', help_text='Status')
     ad_user_c	=	models.CharField(max_length=30, blank=True, null=True, help_text='The user creating the record')
     ad_user_a	=	models.CharField(max_length=30, blank=True, null=True, help_text='The last amending user')
@@ -189,16 +250,17 @@ class Subject(models.Model):
         return reverse('edit', kwargs={'pk': self.pk})
 #Level - class representing the Levels of study per subject
 class Level(models.Model):
-    lv_status_choices = (('1', 'Active'), ('0', 'Inactive'))
+    lv_status_choices = (('1', 'Offered'), ('0', 'Unavailable'))
 
-    lv_code = models.CharField(verbose_name='Code',primary_key=True,max_length=10, help_text='The Level Code - Primary key for the table')
-    lv_name = models.CharField(verbose_name='Level Name',max_length=100, help_text='Leval Name')
-    lv_sb_code	=	models.ForeignKey(Subject,on_delete=models.CASCADE,verbose_name='Subject', help_text='The subject for the study level')
-    lv_status = models.CharField(verbose_name='Status',max_length=1, choices=lv_status_choices, help_text='Status of the Level', default='1')
-    ad_user_c = models.CharField(max_length=30, blank=True, null=True, help_text='The user creating the record')
-    ad_user_a = models.CharField(max_length=30, blank=True, null=True, help_text='The last amending user')
-    ad_date_c = models.DateTimeField(auto_now_add=True, help_text='Date record was created')
-    ad_date_a = models.DateTimeField(auto_now=True, help_text='Date record was last amended')
+    lv_code     = models.AutoField(verbose_name='Code',primary_key=True, help_text='The Level Code - Primary key for the table')
+    lv_name     = models.CharField(verbose_name='Level Name',max_length=100, help_text='Leval Name')
+    lv_sl_code	= models.ForeignKey(SchoolLevel,on_delete=models.CASCADE,related_name='lv_sl_code',verbose_name='School Level', help_text='The school level')
+    lv_sb_code	= models.ForeignKey(Subject,on_delete=models.CASCADE,verbose_name='Subject', help_text='The subject for the study level')
+    lv_status   = models.CharField(verbose_name='Status',max_length=1, choices=lv_status_choices, help_text='Status of the Level', default='1')
+    ad_user_c   = models.CharField(max_length=30, blank=True, null=True, help_text='The user creating the record')
+    ad_user_a   = models.CharField(max_length=30, blank=True, null=True, help_text='The last amending user')
+    ad_date_c   = models.DateTimeField(auto_now=True, blank=True, null=True, help_text='Date record was created')
+    ad_date_a   = models.DateTimeField(auto_now=True,  blank=True, null=True,help_text='Date record was last amended')
     ad_device_c = models.CharField(max_length=100, blank=True, null=True, help_text='The Device creating the record')
     ad_device_a = models.CharField(max_length=100, blank=True, null=True, help_text='The Last amending device')
     ad_ipadress_c = models.CharField(max_length=50, blank=True, null=True, help_text='The record creating ip address')
@@ -222,21 +284,22 @@ class SchoolClass(models.Model):
     type_choice		=	(('1','Academic'),('2', 'Sport'),('3', 'Extra Carricular'))
     status_choice	=	(('1', 'On'),('2' , 'Off'))
 
-    sc_code		=	models.CharField(verbose_name='Code', max_length=10, primary_key=True, help_text='User assigned code for the Class Level')
-    sc_lv_code	=	models.ForeignKey(Level,on_delete=models.CASCADE,verbose_name='Level', help_text='Foreign key to Level')
-    sc_seats    = models.IntegerField(verbose_name='Seats', default=1, help_text='Seats Available in Class')
+    sc_code		= models.CharField(verbose_name='Code', max_length=10, primary_key=True, help_text='User assigned code for the Class Level')
+    sc_sl_code  = models.ForeignKey(SchoolLevel,on_delete=models.CASCADE,related_name='sc_sl_code',verbose_name='School Level', blank=True, null=True, help_text='Foreign key to School Level')
+    sc_lv_code  = models.ForeignKey(Level,on_delete=models.CASCADE,verbose_name='Level', blank=True, null=True, help_text='Foreign key to Level')
+    sc_seats    = models.IntegerField(verbose_name='Seats', default=30, help_text='Seats Available in Class')
     sc_sf_num   = models.ForeignKey(StaffMember, on_delete=models.CASCADE, verbose_name='Staff Member', blank=True, null=True, help_text='Staff member assigned')
-    sc_type		=	models.CharField(verbose_name='Type', max_length=1,choices=type_choice, help_text='Type of the School Class')
-    sc_desc		=	models.CharField(verbose_name='Name', max_length=100, help_text='The description of the School Class')
-    sc_status	=	models.CharField(verbose_name='Status', max_length=1,choices=status_choice,default='1', help_text='Status')
-    ad_user_c	=	models.CharField(max_length=30, blank=True, null=True, help_text='The user creating the record')
-    ad_user_a	=	models.CharField(max_length=30, blank=True, null=True, help_text='The last amending user')
-    ad_date_c	=	models.DateTimeField(auto_now_add=True, help_text='Date record was created')
-    ad_date_a	=	models.DateTimeField(auto_now=True, help_text='Date record was last amended')
-    ad_device_c	=	models.CharField(max_length=100, blank=True, null=True, help_text='The Device creating the record')
-    ad_device_a	=	models.CharField(max_length=100, blank=True, null=True, help_text='The Last amending device')
-    ad_ipadress_c	=	models.CharField(max_length=50, blank=True, null=True, help_text='The record creating ip address')
-    ad_ipadress_a	=	models.CharField(max_length=50, blank=True, null=True, help_text='The last amending ip address')
+    sc_type		= models.CharField(verbose_name='Type', max_length=1,choices=type_choice, help_text='Type of the School Class')
+    sc_desc		= models.CharField(verbose_name='Name', max_length=100, help_text='The description of the School Class')
+    sc_status	= models.CharField(verbose_name='Status', max_length=1,choices=status_choice,default='1', help_text='Status')
+    ad_user_c	= models.CharField(max_length=30, blank=True, null=True, help_text='The user creating the record')
+    ad_user_a	= models.CharField(max_length=30, blank=True, null=True, help_text='The last amending user')
+    ad_date_c	= models.DateTimeField(auto_now_add=True, help_text='Date record was created')
+    ad_date_a	= models.DateTimeField(auto_now=True, help_text='Date record was last amended')
+    ad_device_c	= models.CharField(max_length=100, blank=True, null=True, help_text='The Device creating the record')
+    ad_device_a	= models.CharField(max_length=100, blank=True, null=True, help_text='The Last amending device')
+    ad_ipadress_c =	models.CharField(max_length=50, blank=True, null=True, help_text='The record creating ip address')
+    ad_ipadress_a =	models.CharField(max_length=50, blank=True, null=True, help_text='The last amending ip address')
 
     class Meta:
         ordering = ['sc_code']
@@ -247,6 +310,30 @@ class SchoolClass(models.Model):
 
     def get_absolute_url(self):
         return reverse('Index', args=[str(self.sc_code)])
+
+    def get_post_url(self):
+        return reverse('edit', kwargs={'pk': self.pk})
+
+class ClassSubject(models.Model):
+    cs_status_choices = (('1', 'Available'), ('0', 'Unavailable'))
+
+    cs_code     = models.AutoField(verbose_name='Code', primary_key=True,help_text='Code uniquely identify a table')
+    cs_name     = models.CharField(verbose_name='Subject Name',max_length=100, help_text='Subject Name')
+    cs_sl_code	= models.ForeignKey(SchoolLevel,on_delete=models.CASCADE,verbose_name='School Level', help_text='The school level')
+    cs_sc_code	= models.ForeignKey(SchoolClass,on_delete=models.CASCADE,verbose_name='School Class', blank=True, null=True, help_text='The school School Class')
+    cs_sb_code	=	models.ForeignKey(Subject,on_delete=models.CASCADE,verbose_name='Subject', help_text='The subject for the study level')
+    cs_lv_code	= models.ForeignKey(Level,on_delete=models.CASCADE,verbose_name='Level', blank=True, null=True, help_text='Foreign key to Level')
+    cs_sf_num   = models.ForeignKey(StaffMember, on_delete=models.CASCADE, verbose_name='Staff Member', blank=True, null=True, help_text='Staff member assigned')
+    cs_status   = models.CharField(verbose_name='Status',max_length=1, choices=cs_status_choices, help_text='Status of the Level', default='0')
+    class Meta:
+        ordering = ['cs_name']
+        verbose_name = 'ClassSubject'
+
+    def __str__(self):
+        return self.cs_name
+
+    def get_absolute_url(self):
+        return reverse('Index', args=[str(self.cs_code)])
 
     def get_post_url(self):
         return reverse('edit', kwargs={'pk': self.pk})
@@ -297,7 +384,7 @@ class ClassMember(models.Model):
 
     cm_num       = models.AutoField(verbose_name='Number', primary_key=True, help_text='System generated number uniquely identifying a Class Member')
     cm_sc_code   = models.ForeignKey(SchoolClass, on_delete=models.CASCADE, verbose_name='School Class', help_text='Foreign key to SchoolClass')
-    cm_lv_code   = models.ForeignKey(Level, on_delete=models.CASCADE, verbose_name='Level', help_text='Foreign key to Level')
+    cm_lv_code   = models.ForeignKey(Level, on_delete=models.CASCADE, blank=True, null=True, verbose_name='Level', help_text='Foreign key to Level')
     cm_year      = models.CharField(verbose_name='Year', max_length=4, blank=True, null=True, help_text='Study Year')
     cm_surname   = models.CharField(verbose_name='Surname', max_length=100, help_text='Class Member Surname')
     cm_fname     = models.CharField(verbose_name='First Name', max_length=100, help_text='Class Member First Name')
@@ -329,42 +416,6 @@ class ClassMember(models.Model):
 
     def get_absolute_url(self):
         return reverse('Index', args=[str(self.cm_surname)])
-
-    def get_post_url(self):
-        return reverse('edit', kwargs={'pk': self.pk})
-
-class MemberRegister(models.Model):
-    status_choice  = (('1', 'On'), ('2', 'Suspended'), ('3', 'Expelled'))
-    mark_choice    = (('P', 'Present'), ('S', 'Sick'), ('A', 'Absent'))
-
-    mr_num        = models.AutoField(verbose_name='Number', primary_key=True, help_text='System generated number uniquely identifying a register record')
-    mr_cm_num     = models.ForeignKey(ClassMember, on_delete=models.CASCADE,verbose_name='Student',help_text='The Student')
-    mr_sc_code    = models.ForeignKey(SchoolClass, on_delete=models.CASCADE, verbose_name='School Class', help_text='Foreign key to SchoolClass')
-    mr_year         = models.CharField(verbose_name='Year', max_length=4, help_text='Study Year')
-    mr_term         = models.IntegerField(verbose_name='Term', help_text='The term of the year of study')
-    mr_comment    = models.CharField(verbose_name='Other Name', max_length=100, help_text='Class Member s Other Name')
-    mr_date       = models.DateTimeField(verbose_name='Date', help_text='The date of attendance')
-    mr_day        = models.IntegerField(verbose_name='Day Number', help_text='The day number')
-    mr_mark       = models.CharField(verbose_name='Marked', max_length=1, choices=mark_choice, default='P', help_text='Marked Indicator')
-    mr_status     = models.CharField(verbose_name='Status', max_length=1, choices=status_choice, default='1', help_text='Status')
-    ad_user_c     = models.CharField(max_length=30, blank=True, null=True, help_text='The user creating the record')
-    ad_user_a     = models.CharField(max_length=30, blank=True, null=True, help_text='The last amending user')
-    ad_date_c     = models.DateTimeField(auto_now_add=True, help_text='Date record was created')
-    ad_date_a     = models.DateTimeField(auto_now=True, help_text='Date record was last amended')
-    ad_device_c   = models.CharField(max_length=100, blank=True, null=True, help_text='The Device creating the record')
-    ad_device_a   = models.CharField(max_length=100, blank=True, null=True, help_text='The Last amending device')
-    ad_ipadress_c = models.CharField(max_length=50, blank=True, null=True, help_text='The record creating ip address')
-    ad_ipadress_a = models.CharField(max_length=50, blank=True, null=True, help_text='The last amending ip address')
-
-    class Meta:
-        ordering = ['mr_cm_num']
-        verbose_name = 'Member Register'
-
-    def __str__(self):
-        return self.mr_mark
-
-    def get_absolute_url(self):
-        return reverse('Index', args=[str(self.mr_mark)])
 
     def get_post_url(self):
         return reverse('edit', kwargs={'pk': self.pk})
@@ -412,8 +463,8 @@ class Syllabus(models.Model):
     status_choice = (('1', 'On'),('2' , 'Off'))
 
     sy_code       = models.CharField(verbose_name='Code', max_length=10, primary_key=True, help_text='User assigned code for the Subject')
-    sb_ex_board   = models.CharField(verbose_name='Exam Board', max_length=1,choices=type1_choice,default='1', help_text='Examination Board')
-    sy_lv_code    = models.ForeignKey(Level,on_delete=models.CASCADE,verbose_name='Level',help_text='The Study Level')
+    sb_ex_board   = models.CharField(verbose_name='Exam Board', max_length=1,choices=type1_choice,default='1', blank=True, null=True, help_text='Examination Board')
+    sy_lv_code    = models.ForeignKey(Level,on_delete=models.CASCADE,verbose_name='Level', blank=True, null=True,help_text='The Study Level')
     sy_sb_code    = models.ForeignKey(Subject,on_delete=models.CASCADE,verbose_name='Subject', help_text='The subject for the study level')
     sy_type       = models.CharField(verbose_name='Type', max_length=1,choices=type_choice, help_text='Type of the Syllabus')
     sy_desc       = models.CharField(verbose_name='Description', max_length=100, help_text='The description of the Subject')
@@ -448,13 +499,15 @@ class Schemes(models.Model):
     status_choice = (('0', 'New'),('1', 'Done'), ('2' , 'Pending'), ('3', 'Cancelled'))
 
     ch_num          = models.AutoField(verbose_name='Number',primary_key=True, help_text='Unique identifier for the scheme')
-    ch_lc_num       = models.ForeignKey(LevelClass, on_delete=models.CASCADE, verbose_name='Level Class',help_text='Level Class')
+    ch_lc_num       = models.ForeignKey(LevelClass, on_delete=models.CASCADE, verbose_name='Level Class', null=True, blank=True,help_text='Level Class')
+    ch_sl_code      = models.ForeignKey(SchoolLevel, on_delete=models.CASCADE, verbose_name='School Class',blank=True,null=True, help_text='Level Class')
     ch_sc_code      = models.ForeignKey(SchoolClass, on_delete=models.CASCADE, verbose_name='School Class',help_text='Foreign key to School Class')
+    ch_cs_code      = models.ForeignKey(ClassSubject, on_delete=models.CASCADE, verbose_name='Class Subject',help_text='Foreign key to Class Subject')
     ch_sf_num       = models.ForeignKey(StaffMember, on_delete=models.CASCADE, verbose_name='Staff Member', help_text='Staff member assigned')
-    ch_lv_code      = models.ForeignKey(Level ,on_delete=models.CASCADE,verbose_name='Level',help_text='The Study Level')
+    ch_lv_code      = models.ForeignKey(Level ,on_delete=models.CASCADE,verbose_name='Level', null=True, blank=True,help_text='The Study Level')
     ch_sb_code      = models.ForeignKey(Subject,on_delete=models.CASCADE,verbose_name='Subject', help_text='The subject for the study level')
-    ch_sy_code      = models.ForeignKey(Syllabus,on_delete=models.CASCADE,verbose_name='Syllabus', help_text='The syllabus for subject of the study level')
-    ch_ex_board     = models.CharField(verbose_name='Exam Board', max_length=1,choices=type1_choice,default='1', help_text='Examination Board')
+    ch_sy_code      = models.ForeignKey(Syllabus,on_delete=models.CASCADE,verbose_name='Syllabus', null=True, blank=True, help_text='The syllabus for subject of the study level')
+    ch_ex_board     = models.CharField(verbose_name='Exam Board', max_length=1,choices=type1_choice, null=True, blank=True,default='1', help_text='Examination Board')
     ch_year         = models.CharField(verbose_name='Year', max_length=4, help_text='Study Year')
     ch_term         = models.IntegerField(verbose_name='Term', help_text='The term of the year of study')
     ch_week         = models.IntegerField(verbose_name='Week', null=True, blank=True, help_text='Week covered')
@@ -495,11 +548,13 @@ class Schemes(models.Model):
 class DailyPlan(models.Model):
     type_choice   = (('1','Academic'),('2', 'Sport'),('3', 'Extra Curricular'))
     absorb_choice  = ((80,'more than 80 %'),(75, '75 %'),(50, '50 %'),(25, 'Less than 25 %'))
-    status_choice = (('0', 'Planned'),('1' , 'Delivered'),('2' , 'Deferred'),('W', 'Weekend'))
+    status_choice = (('0', 'Planned'),('1' , 'Delivered'),('2' , 'Deferred'),('W', 'Weekend'),('W', 'Holiday'))
 
     sp_num         = models.AutoField(verbose_name='Number', primary_key=True, help_text='Unique identifier for the daily plan')
     sp_ch_num      = models.ForeignKey(Schemes, on_delete=models.CASCADE,verbose_name='Scheme',help_text='Scheme Plan')
-    sp_lc_num      = models.ForeignKey(LevelClass, on_delete=models.CASCADE, verbose_name='Level Class', help_text='Level Class')
+    sp_lc_num      = models.ForeignKey(LevelClass, on_delete=models.CASCADE, verbose_name='Level Class',blank=True,null=True, help_text='Level Class')
+    sp_sl_code     = models.ForeignKey(SchoolLevel, on_delete=models.CASCADE, verbose_name='School Class',blank=True,null=True, help_text='Level Class')
+    sp_cs_code     = models.ForeignKey(ClassSubject, on_delete=models.CASCADE, verbose_name='Class Subject',help_text='Foreign key to Class Subject')
     sp_sc_code     = models.ForeignKey(SchoolClass, on_delete=models.CASCADE, verbose_name='School Class',help_text='Foreign key to School Class')
     sp_sb_code     = models.ForeignKey(Subject,on_delete=models.CASCADE,verbose_name='Subject', help_text='The subject for the study level')
     sp_year        = models.CharField(verbose_name='Year', max_length=4, help_text='Study Year')
@@ -517,6 +572,7 @@ class DailyPlan(models.Model):
     sp_top         = models.CharField(verbose_name='Top Group', max_length=100, help_text='Upper Group Members', null=True, blank=True)
     sp_middle      = models.CharField(verbose_name='Normal Group', max_length=100, help_text='Normal Group Members', null=True, blank=True)
     sp_lower       = models.CharField(verbose_name='Lower Group', max_length=100, help_text='Lower Group Members', null=True, blank=True)
+    sp_hnotes      = models.CharField(verbose_name='Homework?', max_length=100, help_text='Homework Notes', null=True, blank=True)
     sp_del_date    = models.DateTimeField(verbose_name='Delivery Date', help_text='Date of execution of lesson', null=True, blank=True)
     sp_plan_date   = models.DateTimeField(verbose_name='Planned Date', help_text='Planned date of execution of lesson', null=True, blank=True)
     sp_status      = models.CharField(verbose_name='Status', max_length=1,choices=status_choice,default='0', help_text='Status')
@@ -543,13 +599,61 @@ class DailyPlan(models.Model):
     def get_post_url(self):
         return reverse('edit', kwargs={'pk': self.pk})
 
+# MemberRsgister -  Class representing the class for each Member s attendance
+class MemberRegister(models.Model):
+    status_choice  = (('N', 'Normal'), ('W', 'Weekend'), ('H', 'Holiday'))
+    mark_choice    = (('P', 'Present'), ('S', 'Sick'), ('A', 'Absent'), ('H', 'Holiday'))
+
+    mr_num        = models.AutoField(verbose_name='Number', primary_key=True, help_text='System generated number uniquely identifying a register record')
+    mr_cm_num     = models.ForeignKey(ClassMember, on_delete=models.CASCADE,verbose_name='Student',help_text='The Student')
+    mr_sc_code    = models.ForeignKey(SchoolClass, on_delete=models.CASCADE, verbose_name='School Class', help_text='Foreign key to SchoolClass')
+    mr_sp_num      = models.ForeignKey(DailyPlan, on_delete=models.CASCADE,verbose_name='Daily Plan', blank=True, null=True,help_text='Daily Plan')
+    mr_year         = models.CharField(verbose_name='Year', max_length=4, help_text='Study Year')
+    mr_term         = models.IntegerField(verbose_name='Term', help_text='The term of the year of study')
+    mr_comment    = models.CharField(verbose_name='Other Name', max_length=100, help_text='Class Member s Other Name')
+    mr_date       = models.DateTimeField(verbose_name='Date', help_text='The date of attendance')
+    mr_day        = models.IntegerField(verbose_name='Day Number', help_text='The day number')
+    mr_mark       = models.CharField(verbose_name='Marked', max_length=1, choices=mark_choice, default='P', help_text='Marked Indicator')
+    mr_mark_1       = models.CharField(verbose_name='Subject 1', max_length=1, choices=mark_choice, default='A', help_text='Marked Indicator')
+    mr_mark_2       = models.CharField(verbose_name='Subject 2', max_length=1, choices=mark_choice, default='A', help_text='Marked Indicator')
+    mr_mark_3       = models.CharField(verbose_name='Subject 3', max_length=1, choices=mark_choice, default='A', help_text='Marked Indicator')
+    mr_mark_4       = models.CharField(verbose_name='Subject 4', max_length=1, choices=mark_choice, default='A', help_text='Marked Indicator')
+    mr_mark_5       = models.CharField(verbose_name='Subject 5', max_length=1, choices=mark_choice, default='A', help_text='Marked Indicator')
+    mr_mark_6       = models.CharField(verbose_name='Subject 6', max_length=1, choices=mark_choice, default='A', help_text='Marked Indicator')
+    mr_mark_7       = models.CharField(verbose_name='Subject 7', max_length=1, choices=mark_choice, default='A', help_text='Marked Indicator')
+    mr_mark_8       = models.CharField(verbose_name='Subject 8', max_length=1, choices=mark_choice, default='A', help_text='Marked Indicator')
+    mr_mark_9       = models.CharField(verbose_name='Subject 9', max_length=1, choices=mark_choice, default='A', help_text='Marked Indicator')
+    mr_mark_10       = models.CharField(verbose_name='Subject 10', max_length=1, choices=mark_choice, default='A', help_text='Marked Indicator')
+    mr_status     = models.CharField(verbose_name='Status', max_length=1, choices=status_choice, default='1', help_text='Status')
+    ad_user_c     = models.CharField(max_length=30, blank=True, null=True, help_text='The user creating the record')
+    ad_user_a     = models.CharField(max_length=30, blank=True, null=True, help_text='The last amending user')
+    ad_date_c     = models.DateTimeField(auto_now_add=True, help_text='Date record was created')
+    ad_date_a     = models.DateTimeField(auto_now=True, help_text='Date record was last amended')
+    ad_device_c   = models.CharField(max_length=100, blank=True, null=True, help_text='The Device creating the record')
+    ad_device_a   = models.CharField(max_length=100, blank=True, null=True, help_text='The Last amending device')
+    ad_ipadress_c = models.CharField(max_length=50, blank=True, null=True, help_text='The record creating ip address')
+    ad_ipadress_a = models.CharField(max_length=50, blank=True, null=True, help_text='The last amending ip address')
+
+    class Meta:
+        ordering = ['mr_cm_num']
+        verbose_name = 'Member Register'
+
+    def __str__(self):
+        return self.mr_mark
+
+    def get_absolute_url(self):
+        return reverse('Index', args=[str(self.mr_mark)])
+
+    def get_post_url(self):
+        return reverse('edit', kwargs={'pk': self.pk})
+
 # ClassAssessment -  Class representing the assessments given to a class
 class ClassAssessment(models.Model):
     type_choice = (('1', 'Homework'), ('2', 'Tests'), ('3', 'End Of Session Exam'))
     status_choice = (('1', 'On'), ('2', 'Off'))
 
     as_num = models.AutoField(verbose_name='Number', primary_key=True, help_text='System generated number uniquely identifying an Assessment')
-    as_lc_num = models.ForeignKey(LevelClass, on_delete=models.CASCADE,related_name='level_key',verbose_name='Level Class' ,help_text='The Level Class')
+    as_lc_num = models.ForeignKey(LevelClass, on_delete=models.CASCADE,related_name='level_key', blank=True, null=True,verbose_name='Level Class' ,help_text='The Level Class')
     as_sc_code = models.ForeignKey(SchoolClass, on_delete=models.CASCADE,related_name='sc_key', verbose_name='School Class', help_text='Foreign key to School Class')
     as_ch_num = models.ForeignKey(Schemes, on_delete=models.CASCADE,related_name='ch_key', verbose_name='Scheme', blank=True, null=True, help_text='Foreign key to Schemes')
     as_sb_code = models.ForeignKey(Subject, on_delete=models.CASCADE,related_name='sb_key', verbose_name='Subject',help_text='Foreign key to Subject')
@@ -592,7 +696,7 @@ class LearnerAssessment(models.Model):
     la_num = models.AutoField(verbose_name='Number', primary_key=True, help_text='Unique identifier for a Learner Assessment')
     la_as_num = models.ForeignKey(ClassAssessment, on_delete=models.CASCADE,related_name='la_as_num', verbose_name='Assessment', help_text='Student s assessment')
     la_cm_num = models.ForeignKey(ClassMember, on_delete=models.CASCADE,related_name='la_cm_key',verbose_name='Student' ,help_text='The Student')
-    la_lc_num = models.ForeignKey(LevelClass, on_delete=models.CASCADE,related_name='la_lc_key',verbose_name='Level Class' ,help_text='The Level Class')
+    la_lc_num = models.ForeignKey(LevelClass, on_delete=models.CASCADE,related_name='la_lc_key',blank=True, null=True,verbose_name='Level Class' ,help_text='The Level Class')
     la_sc_code = models.ForeignKey(SchoolClass, on_delete=models.CASCADE,related_name='la_sc_key', verbose_name='School Class', help_text='Foreign key to School Class')
     la_sb_code = models.ForeignKey(Subject, on_delete=models.CASCADE,related_name='la_sb_key',blank=True, null=True, verbose_name='Subject',default=1,help_text='Subject of study')
     la_type = models.CharField(verbose_name='Type', max_length=1, choices=type_choice, help_text='Type of the Subject')
@@ -633,7 +737,7 @@ class StaffSubject(models.Model):
     ss_num = models.AutoField(verbose_name='Number',primary_key=True, help_text='Code uniquely identify a record')
     ss_sf_num	=	models.ForeignKey(StaffMember,on_delete=models.CASCADE,verbose_name='Staff Member', help_text='Staff Member')
     ss_sb_code	=	models.ForeignKey(Subject,on_delete=models.CASCADE,verbose_name='Subject', help_text='Foreign key to Subject')
-    ss_lv_code	=	models.ForeignKey(Level,on_delete=models.CASCADE,verbose_name='Up to Level', help_text='Teaches up to level ?')
+    ss_lv_code	=	models.ForeignKey(Level,on_delete=models.CASCADE,verbose_name='Up to Level', blank=True, null=True, help_text='Teaches up to level ?')
     ss_status   = models.CharField(verbose_name='Status',max_length=1, choices=ss_status_choices, help_text='Status of the currency', default='1')
     ad_user_c   = models.CharField(max_length=30, blank=True, null=True, help_text='The user creating the record')
     ad_user_a   = models.CharField(max_length=30, blank=True, null=True, help_text='The last amending user')
@@ -724,20 +828,25 @@ class FacilitySpace(models.Model):
 # SpaceSlot -  Class representing the Slot for each Space of the Facility
 class SpaceSlot(models.Model):
     type_choice = (('1', 'Academic'), ('2', 'Sport'), ('3', 'Extra Carricular'))
-    status_choice = (('1', 'On'), ('2', 'Off'))
+    status_choice = (('1', 'Available'), ('2', 'Taken'))
 
-    sp_num = models.AutoField(verbose_name='Number', primary_key=True, help_text='System generated number uniquely identifying a Level Class')
-    sp_fs_num = models.ForeignKey(FacilitySpace, on_delete=models.CASCADE, verbose_name='Facility', help_text='Foreign key to Facility')
-    sp_type = models.CharField(verbose_name='Type', max_length=1, choices=type_choice, help_text='Type of the Subject')
-    sp_desc = models.CharField(verbose_name='Name', max_length=100, help_text='The description of the Subject')
-    sp_hrs = models.DecimalField(verbose_name='Duration', max_digits=10, decimal_places=2, default=0, help_text='Duration of the slot', null=True, blank=True)
-    sp_fromtime = models.DateTimeField(verbose_name='From Time', help_text='Required hrs for Subject', null=True,blank=True)
-    sp_totime = models.DateTimeField(verbose_name='To Time', help_text='Required hrs for Subject', null=True, blank=True)
-    sp_status = models.CharField(verbose_name='Status', max_length=1, choices=status_choice, default='1',help_text='Status')
-    ad_user_c = models.CharField(max_length=30, blank=True, null=True, help_text='The user creating the record')
-    ad_user_a = models.CharField(max_length=30, blank=True, null=True, help_text='The last amending user')
-    ad_date_c = models.DateTimeField(auto_now_add=True, help_text='Date record was created')
-    ad_date_a = models.DateTimeField(auto_now=True, help_text='Date record was last amended')
+    sp_num         = models.AutoField(verbose_name='Number', primary_key=True, help_text='System generated number uniquely identifying a Level Class')
+    sp_fs_num      = models.ForeignKey(FacilitySpace, on_delete=models.CASCADE, verbose_name='Space', help_text='Foreign key to Facility')
+    sp_fc_num      = models.ForeignKey(Facility, on_delete=models.CASCADE, verbose_name='Facility', help_text='Foreign key to Facility')
+    sp_sc_code	   = models.ForeignKey(SchoolClass,on_delete=models.CASCADE,verbose_name='School Class', blank=True, null=True, help_text='The school School Class')
+    sp_sf_num      = models.ForeignKey(StaffMember, on_delete=models.CASCADE, verbose_name='Staff Member', blank=True, null=True, help_text='Staff member assigned')
+    sp_type        = models.CharField(verbose_name='Type', max_length=1, choices=type_choice, default=1, help_text='Type of the slot')
+    sp_desc        = models.CharField(verbose_name='Name', max_length=100, help_text='The description of the Subject')
+    sp_hrs         = models.DecimalField(verbose_name='Duration in minutes', max_digits=10, decimal_places=2, default=0, help_text='Duration', null=True, blank=True)
+    sp_date        = models.DateTimeField(verbose_name='Date', help_text='Required hrs for Subject', null=True,blank=True)
+    sp_day         = models.IntegerField(verbose_name='day', null=True, blank=True, help_text='Day of the session')
+    sp_start_time  = models.TimeField(verbose_name='Start Time', null=True, blank=True, help_text='Starting Time')
+    sp_finish_time = models.TimeField(verbose_name='Finish Time', null=True, blank=True, help_text='Finishing Time')
+    sp_status   = models.CharField(verbose_name='Status', max_length=1, choices=status_choice, default='1',help_text='Status')
+    ad_user_c   = models.CharField(max_length=30, blank=True, null=True, help_text='The user creating the record')
+    ad_user_a   = models.CharField(max_length=30, blank=True, null=True, help_text='The last amending user')
+    ad_date_c   = models.DateTimeField(auto_now_add=True, help_text='Date record was created')
+    ad_date_a   = models.DateTimeField(auto_now=True, help_text='Date record was last amended')
     ad_device_c = models.CharField(max_length=100, blank=True, null=True, help_text='The Device creating the record')
     ad_device_a = models.CharField(max_length=100, blank=True, null=True, help_text='The Last amending device')
     ad_ipadress_c = models.CharField(max_length=50, blank=True, null=True, help_text='The record creating ip address')
@@ -763,6 +872,7 @@ class ClassBilling(models.Model):
 
     cb_num        = models.AutoField(verbose_name='Number', primary_key=True, help_text='System generated number uniquely identifying a Level Class')
     cb_sc_code    = models.ForeignKey(SchoolClass, on_delete=models.CASCADE,related_name='cb_sc', verbose_name='School Class',blank=True, null=True,help_text='Foreign key to SchoolClass')
+    cb_sl_code	  = models.ForeignKey(SchoolLevel,on_delete=models.CASCADE,verbose_name='School Level', help_text='The school level')
     cb_lv_code    = models.ForeignKey(Level, on_delete=models.CASCADE,related_name='cb_lv', verbose_name='Level',blank=True, null=True, help_text='Foreign key to Level')
     cb_type       = models.CharField(verbose_name='Type', max_length=1, choices=type_choice,default='1', help_text='Type of the Subject')
     cb_desc       = models.CharField(verbose_name='Name', max_length=100, help_text='The description of the Rate')
@@ -799,6 +909,7 @@ class SubjectBilling(models.Model):
 
     jb_num        = models.AutoField(verbose_name='Number', primary_key=True, help_text='System generated number uniquely identifying a Level Class')
     jb_lc_num     = models.ForeignKey(LevelClass, on_delete=models.CASCADE,related_name='jb_lc', verbose_name='Level Class',blank=True, null=True, help_text='Foreign key to Level Class')
+    jb_sl_code	  = models.ForeignKey(SchoolLevel,on_delete=models.CASCADE,verbose_name='School Level', help_text='The school level')
     jb_sc_code    = models.ForeignKey(SchoolClass, on_delete=models.CASCADE,related_name='jb_sc', verbose_name='School Class',blank=True, null=True,help_text='Foreign key to SchoolClass')
     jb_lv_code    = models.ForeignKey(Level, on_delete=models.CASCADE,related_name='jb_lv', verbose_name='Level',blank=True, null=True, help_text='Foreign key to Level')
     jb_sb_code    = models.ForeignKey(Subject, on_delete=models.CASCADE,related_name='jb_sb', verbose_name='Subject',blank=True, null=True, help_text='Foreign key to Subject')
@@ -835,10 +946,11 @@ class MemberRecord(models.Model):
         mr_status_choices = (('1', 'Live'), ('2', 'Reversed'), ('3', 'Cancelled'))
         mr_cat_choices = (('1', 'Contributions'), ('2', 'Advances'),('3', 'Interest'),('4', 'Penalties'),('G', 'General'))
         mr_pay_choices = (('1', 'Cheque'), ('2', 'Transfer'), ('3', 'Cash'), ('4', 'Mobile Money'))
+
         mr_num = models.AutoField(verbose_name='Number', primary_key=True, help_text='System generated number uniquely identifying a group member transaction')
         mr_cm_num = models.ForeignKey(ClassMember, on_delete=models.CASCADE, related_name='mr_cm', verbose_name='Member', help_text='Learner')
         mr_sc_code = models.ForeignKey(SchoolClass, on_delete=models.CASCADE,related_name='mr_sc', verbose_name='School Class', help_text='The Class')
-        mr_lv_code = models.ForeignKey(Level, on_delete=models.CASCADE,related_name='mr_lv', verbose_name='Level', help_text='The study Level')
+        mr_lv_code = models.ForeignKey(Level, on_delete=models.CASCADE,related_name='mr_lv', blank=True, null=True, verbose_name='Level', help_text='The study Level')
         mr_cb_num = models.ForeignKey(ClassBilling, on_delete=models.CASCADE,related_name='mr_lv',blank=True, null=True, verbose_name='Billing Head', help_text='Name of the class based fee ')
         mr_jb_num = models.ForeignKey(SubjectBilling, on_delete=models.CASCADE,related_name='mr_sb',blank=True, null=True, verbose_name='Billing Head', help_text='Name of the subject based fee')
         mr_year = models.IntegerField(verbose_name='Period', help_text='Year for which the fees are considered')
@@ -916,6 +1028,85 @@ class Receipt(models.Model):
 
     def get_absolute_url(self):
         return reverse('Index', args=[str(self.rc_num)])
+
+    def get_post_url(self):
+        return reverse('edit', kwargs={'pk': self.pk})
+
+# authrelation -  Class representing the class for each authorized relation or person for picking and dropping a child
+
+class AuthRelation(models.Model):
+    ar_status_choices = (('1', 'Active'), ('0', 'Inactive'))
+
+    ar_num     = models.AutoField(verbose_name='Code', primary_key=True,help_text='Code uniquely identify a table')
+    ar_cm_num  = models.ForeignKey(ClassMember,on_delete=models.CASCADE, blank=True,verbose_name='Class Member', help_text='Class Member (Student)')
+    ar_sc_code = models.ForeignKey(SchoolClass, on_delete=models.CASCADE, blank=True, verbose_name='School Class', help_text='Foreign key to SchoolClass')
+    ar_sname   = models.CharField(verbose_name='Surname',max_length=100, help_text='Surname')
+    ar_fname   = models.CharField(verbose_name='First Name',max_length=100, help_text='First Name')
+    ar_nid     = models.CharField(verbose_name='National ID',max_length=20, help_text='National ID')
+    ar_phone   = models.CharField(verbose_name='Phone',max_length=20, help_text='Contact Phone')
+    ar_email   = models.CharField(verbose_name='Email',max_length=100, help_text='Email Address')
+    ar_status  = models.CharField(verbose_name='Status',max_length=1, choices=ar_status_choices, help_text='Status of the Level', default='0')
+    ad_user_c    = models.CharField(max_length=30, blank=True, null=True, help_text='The user creating the record')
+    ad_user_a    = models.CharField(max_length=30, blank=True, null=True, help_text='The last amending user')
+    ad_date_c    = models.DateTimeField(auto_now_add=True, help_text='Date record was created')
+    ad_date_a    = models.DateTimeField(auto_now=True, help_text='Date record was last amended')
+    ad_device_c  = models.CharField(max_length=100, blank=True, null=True, help_text='The Device creating the record')
+    ad_device_a  = models.CharField(max_length=100, blank=True, null=True, help_text='The Last amending device')
+    ad_ipadress_c = models.CharField(max_length=50, blank=True, null=True, help_text='The record creating ip address')
+    ad_ipadress_a = models.CharField(max_length=50, blank=True, null=True, help_text='The last amending ip address')
+
+    class Meta:
+        ordering = ['ar_sname']
+        verbose_name = 'Relations'
+
+    def __str__(self):
+        return self.ar_sname
+
+    def get_absolute_url(self):
+        return reverse('Index', args=[str(self.ar_num)])
+
+    def get_post_url(self):
+        return reverse('edit', kwargs={'pk': self.pk})
+
+# membermovement -  Class representing the class for each student movement in terms of being dropped or picked
+class MemberMovement(models.Model):
+    dr_status_choices = (('E', 'Expected'), ('S', 'Set'),('P', 'Placed'))
+    pk_status_choices = (('W', 'Waiting'), ('S', 'Set'),('P', 'Picked'))
+    mm_status_choices = (('0', 'Open'), ('1', 'Set'),('2', 'Closed'))
+
+    mm_num       = models.AutoField(verbose_name='Code', primary_key=True,help_text='Code uniquely identify a table')
+    mm_cm_num    = models.ForeignKey(ClassMember,on_delete=models.CASCADE,verbose_name='Class Member', help_text='Class Member (Student)')
+    mm_sc_code   = models.ForeignKey(SchoolClass, on_delete=models.CASCADE, verbose_name='School Class', help_text='Foreign key to SchoolClass')
+    mm_fs_num    = models.ForeignKey(FacilitySpace,  blank=True, null=True,on_delete=models.CASCADE, verbose_name='Location', help_text='Current location')
+    mm_day       = models.IntegerField(verbose_name='Day', blank=True, null=True,help_text='Day of the term')
+    mm_date      = models.DateTimeField(verbose_name='Date', blank=True, null=True, help_text='Date of placement')
+    mm_dr_ar_num = models.ForeignKey(AuthRelation,on_delete=models.CASCADE, related_name='dr_num_key', blank=True, null=True,verbose_name='Relation', help_text='Authorized Relation')
+    mm_date_dr   = models.TimeField(verbose_name='Placement Time', blank=True, null=True, help_text='Time of placement')
+    mm_dr_status = models.CharField(verbose_name='Placed - Status',max_length=1, choices=dr_status_choices, blank=True, null=True, help_text='Status', default='0')
+    mm_dr_notes  = models.CharField(verbose_name='Notes',max_length=20,  blank=True, null=True,help_text='Placement Notes')
+    mm_pk_ar_num = models.ForeignKey(AuthRelation,on_delete=models.CASCADE, related_name='pk_num_key', blank=True, null=True,verbose_name='Relation', help_text='Authorized Relation')
+    mm_date_pk   = models.TimeField(verbose_name='Pickup Time',  blank=True, null=True,help_text='Time of pickup')
+    mm_pk_status = models.CharField(verbose_name='Picked - Status',max_length=1, choices=pk_status_choices, blank=True, null=True, help_text='Status', default='0')
+    mm_pk_notes  = models.CharField(verbose_name='Notes',max_length=20, blank=True, null=True, help_text='pickup Notes')
+    mm_status    = models.CharField(verbose_name='Status',max_length=1, choices=mm_status_choices, blank=True, null=True, help_text='Status of the movement', default='0')
+    ad_user_c  = models.CharField(max_length=30, blank=True, null=True, help_text='The user creating the record')
+    ad_user_a  = models.CharField(max_length=30, blank=True, null=True, help_text='The last amending user')
+    ad_date_c  = models.DateTimeField(auto_now_add=True,  blank=True, null=True,help_text='Date record was created')
+    ad_date_a  = models.DateTimeField(auto_now=True,  blank=True, null=True,help_text='Date record was last amended')
+    ad_device_c  = models.CharField(max_length=100, blank=True, null=True, help_text='The Device creating the record')
+    ad_device_a  = models.CharField(max_length=100, blank=True, null=True, help_text='The Last amending device')
+    ad_ipadress_c = models.CharField(max_length=50, blank=True, null=True, help_text='The record creating ip address')
+    ad_ipadress_a = models.CharField(max_length=50, blank=True, null=True, help_text='The last amending ip address')
+
+    class Meta:
+        ordering = ['mm_day']
+        verbose_name = 'membermovement'
+
+    def __str__(self):
+        return str(self.mm_cm_num)
+
+    def get_absolute_url(self):
+        return reverse('Index', args=[str(self.mm_num)])
 
     def get_post_url(self):
         return reverse('edit', kwargs={'pk': self.pk})

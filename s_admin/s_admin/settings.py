@@ -85,7 +85,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 's_admin.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
